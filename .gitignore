@@ -1,0 +1,68 @@
+# Meridian — LLM Evaluation & Benchmarking Platform
+# .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment / secrets — NEVER COMMIT
+.env
+.env.local
+.env.production
+backend/.env
+*.pem
+*.key
+
+# Database
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.coveragerc
+
+# Alembic
+backend/alembic/versions/*.py   # don't ignore — these should be committed
+!backend/alembic/versions/
+
+# Reports / exports generated at runtime
+backend/exports/
+
+# Extracted spec text (temp)
+_docs_extracted.txt
+
+# Node (frontend, when integrated)
+node_modules/
+.next/
+dist/
+.vercel/
+
+# Docker
+*.tar

@@ -1,0 +1,51 @@
+# Meridian Backend Dependencies
+# Zero-budget LLM Evaluation & Benchmarking Platform
+
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# Database / ORM
+sqlalchemy==2.0.36
+alembic==1.13.3
+asyncpg==0.29.0          # async Postgres driver (Neon)
+psycopg2-binary==2.9.10  # sync Postgres driver (Alembic migrations)
+
+# Pydantic (FastAPI uses v2)
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# HTTP clients for LLM provider adapters
+httpx==0.27.2
+tenacity==9.0.0          # retry/backoff
+
+# Evaluation: text metrics
+rouge-score==0.1.2
+scikit-learn==1.5.2      # F1, precision, recall
+sentence-transformers==3.1.1   # semantic similarity
+
+# Evaluation: NLP (claim extraction for hallucination module)
+spacy==3.7.6
+
+# Async support
+anyio==4.6.2
+
+# Security: API key encryption
+cryptography==43.0.1
+
+# Reporting: PDF export
+reportlab==4.2.5
+# CSV is stdlib
+
+# WebSocket (run progress streaming)
+websockets==13.1
+
+# Testing
+pytest==8.3.3
+pytest-asyncio==0.24.0
+pytest-mock==3.14.0
+respx==0.21.1             # mock httpx calls in adapter tests
+httpx                     # also a test dependency
+
+# Development utilities
+python-dotenv==1.0.1
