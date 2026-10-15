@@ -99,6 +99,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+  stopRun: (runId: string) =>
+    request<{ message: string; status: string; run_id: string; succeeded_cells?: number; failed_cells?: number }>(
+      `/runs/${runId}/stop`,
+      { method: 'POST' }
+    ),
 
   // Results & Comparison
   getRunResults: (runId: string, modelId?: string) =>
