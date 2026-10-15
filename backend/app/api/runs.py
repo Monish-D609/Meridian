@@ -123,6 +123,32 @@ async def create_and_start_run(
     return run
 
 
+@router.post("/runs/{run_id}/stop")
+async def stop_run_endpoint(run_id: str, db: AsyncSession = Depends(get_db)):
+    """
+    Stop an ongoing benchmark run immediately.
+    Halts remaining pending cells, updates tallies, and produces results
+    only for the tests conducted so far.
+    """
+    from app.manager.run_manager import stop_run
+
+    run = await db.get(BenchmarkRun, run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    if run.status in ("completed", "failed", "stopped"):
+        return {"message": f"Run is already {run.status}", "status": run.status, "run_id": run_id}
+
+    stopped = await stop_run(run_id, AsyncSessionLocal)
+    return {
+        "message": "Run stopped successfully. Results compiled for conducted tests.",
+        "status": stopped.status,
+        "run_id": run_id,
+        "succeeded_cells": stopped.succeeded_cells,
+        "failed_cells": stopped.failed_cells,
+    }
+
+
 @router.delete("/runs/{run_id}", status_code=204)
 async def delete_run(run_id: str, db: AsyncSession = Depends(get_db)):
     run = await db.get(BenchmarkRun, run_id)
