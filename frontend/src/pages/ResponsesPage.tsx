@@ -72,7 +72,7 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
   const sampleResponses: DisplayItem[] = [
     {
       id: 'resp-1',
-      model: 'Grok 2 (xAI)',
+      model: 'Llama 3.1 8B Instruct (Cloudflare)',
       category: 'Factual QA',
       quality: 54,
       groundedness: '58%',
@@ -100,7 +100,7 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
     },
     {
       id: 'resp-2',
-      model: 'Grok 2 (xAI)',
+      model: 'Llama 3.1 8B Instruct (Cloudflare)',
       category: 'Coding',
       quality: 96,
       groundedness: '100%',
@@ -115,7 +115,7 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
     },
     {
       id: 'resp-3',
-      model: 'Grok 2 (xAI)',
+      model: 'Llama 3.1 8B Instruct (Cloudflare)',
       category: 'Mathematics',
       quality: 88,
       groundedness: '95%',
@@ -130,7 +130,7 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
     },
     {
       id: 'resp-4',
-      model: 'Grok 2 (xAI)',
+      model: 'Llama 3.1 8B Instruct (Cloudflare)',
       category: 'Factual QA',
       quality: 41,
       groundedness: '42%',
@@ -152,7 +152,7 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
     },
     {
       id: 'resp-5',
-      model: 'Grok 2 (xAI)',
+      model: 'Llama 3.1 8B Instruct (Cloudflare)',
       category: 'Reasoning',
       quality: 91,
       groundedness: '98%',
