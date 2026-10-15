@@ -51,16 +51,13 @@ You can add or update your provider credentials at any time in **Settings** insi
 CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
 
-# Priority #2: Google AI Studio (Gemini 1.5 Flash Judge)
-GEMINI_API_KEY=your_gemini_api_key
-
-# Priority #3: xAI (Grok 2 / Grok 2 Mini)
-GROK_API_KEY=your_xai_api_key
-
-# Priority #4: Groq
+# Priority #2: Groq (Ultra-fast LPU inference)
 GROQ_API_KEY=your_groq_api_key
 
-# Priority #10: OpenRouter (Free tier models)
+# Priority #3: Google AI Studio (Gemini 1.5 Flash Judge & Target Models)
+GEMINI_API_KEY=your_gemini_api_key
+
+# Priority #4: OpenRouter (Free tier models)
 OPENROUTER_API_KEY=your_openrouter_api_key
 ```
 
