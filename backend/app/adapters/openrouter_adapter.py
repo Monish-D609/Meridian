@@ -81,9 +81,11 @@ class OpenRouterAdapter(BaseAdapter):
 
         choice = data["choices"][0]
         usage = data.get("usage", {})
+        msg = choice.get("message", {})
+        text = msg.get("content") or msg.get("reasoning") or ""
 
         return AdapterResponse(
-            text=choice["message"]["content"],
+            text=text,
             input_tokens=usage.get("prompt_tokens"),
             output_tokens=usage.get("completion_tokens"),
             latency_ms=latency_ms,
