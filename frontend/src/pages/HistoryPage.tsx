@@ -29,7 +29,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ onSelectRun, onNavigat
   const demoPastRuns = [
     {
       id: 'demo-run-1',
-      name: 'Grok 2 & Gemini Flash vs Baselines, Oct 2026',
+      name: 'Cloudflare & Gemini Flash vs Baselines, Oct 2026',
       models: '2 models · 7 categories',
       baseline: 'v2026.09',
       status: 'ok',
@@ -158,7 +158,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ onSelectRun, onNavigat
 
       <section className="panel" style={{ marginTop: 20 }}>
         <div className="panel-head">
-          <h2>Tier over time: Grok 2 (xAI)</h2>
+          <h2>Tier over time: Llama 3.1 8B Instruct (Cloudflare)</h2>
           <span className="hint">Coding & Math categories across baseline updates</span>
         </div>
         <div className="table-wrap">
