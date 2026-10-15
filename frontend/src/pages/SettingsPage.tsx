@@ -6,7 +6,7 @@ export const SettingsPage: React.FC = () => {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [configuredProviders, setConfiguredProviders] = useState<string[]>([]);
   const [baselines, setBaselines] = useState<BaselineModel[]>([]);
-  const [selectedProvider, setSelectedProvider] = useState('xai');
+  const [selectedProvider, setSelectedProvider] = useState('cloudflare');
   const [apiKeyInput, setApiKeyInput] = useState('');
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
@@ -37,7 +37,7 @@ export const SettingsPage: React.FC = () => {
         ]);
         setProviders(provs);
         const serverConfigured = conf.configured_providers || [];
-        const localSaved = ['xai', 'gemini', 'openrouter', 'cloudflare', 'groq'].filter((p) => {
+        const localSaved = ['cloudflare', 'gemini', 'groq', 'openrouter'].filter((p) => {
           try {
             return !!localStorage.getItem('meridian_api_key_' + p);
           } catch {
@@ -121,21 +121,31 @@ export const SettingsPage: React.FC = () => {
 
             <div className="key-line">
               <div>
-                <b>xAI (Grok - Elon Musk)</b>
-                <div className="small muted mono">grok-2-latest, grok-2-mini</div>
+                <b>Cloudflare Workers AI</b>
+                <div className="small muted mono">llama-3.1-8b-instruct, mistral-7b-instruct</div>
               </div>
-              <span className={`status ${configuredProviders.includes('xai') ? 'ok' : 'wait'}`}>
-                {configuredProviders.includes('xai') ? 'Connected' : 'Configure in .env'}
+              <span className={`status ${configuredProviders.includes('cloudflare') ? 'ok' : 'wait'}`}>
+                {configuredProviders.includes('cloudflare') ? 'Connected' : 'Configure in .env'}
               </span>
             </div>
 
             <div className="key-line">
               <div>
                 <b>Google AI Studio (Gemini)</b>
-                <div className="small muted mono">gemini-1.5-flash, LLM-Judge</div>
+                <div className="small muted mono">gemini-3.5-flash, gemini-1.5-flash, LLM-Judge</div>
               </div>
-              <span className={`status ${configuredProviders.includes('gemini') ? 'ok' : 'wait'}`}>
-                {configuredProviders.includes('gemini') ? 'Connected' : 'Configure in .env'}
+              <span className={`status ${configuredProviders.includes('gemini') || configuredProviders.includes('google') ? 'ok' : 'wait'}`}>
+                {configuredProviders.includes('gemini') || configuredProviders.includes('google') ? 'Connected' : 'Configure in .env'}
+              </span>
+            </div>
+
+            <div className="key-line">
+              <div>
+                <b>Groq</b>
+                <div className="small muted mono">llama-3.1-8b-instant, gemma2-9b-it</div>
+              </div>
+              <span className={`status ${configuredProviders.includes('groq') ? 'ok' : 'wait'}`}>
+                {configuredProviders.includes('groq') ? 'Connected' : 'Configure in .env'}
               </span>
             </div>
 
@@ -146,26 +156,6 @@ export const SettingsPage: React.FC = () => {
               </div>
               <span className={`status ${configuredProviders.includes('openrouter') ? 'ok' : 'wait'}`}>
                 {configuredProviders.includes('openrouter') ? 'Connected' : 'Configure in .env'}
-              </span>
-            </div>
-
-            <div className="key-line">
-              <div>
-                <b>Cloudflare Workers AI</b>
-                <div className="small muted mono">Serverless inference allocation</div>
-              </div>
-              <span className={`status ${configuredProviders.includes('cloudflare') ? 'ok' : 'wait'}`}>
-                {configuredProviders.includes('cloudflare') ? 'Connected' : 'Configure in .env'}
-              </span>
-            </div>
-
-            <div className="key-line">
-              <div>
-                <b>Groq</b>
-                <div className="small muted mono">LPU fast inference engine</div>
-              </div>
-              <span className={`status ${configuredProviders.includes('groq') ? 'ok' : 'wait'}`}>
-                {configuredProviders.includes('groq') ? 'Connected' : 'Configure in .env'}
               </span>
             </div>
 
@@ -186,11 +176,10 @@ export const SettingsPage: React.FC = () => {
                       ))
                     ) : (
                       <>
-                        <option value="xai">xAI (Grok)</option>
-                        <option value="gemini">Google AI Studio (Gemini)</option>
-                        <option value="openrouter">OpenRouter</option>
                         <option value="cloudflare">Cloudflare Workers AI</option>
+                        <option value="gemini">Google AI Studio (Gemini)</option>
                         <option value="groq">Groq</option>
+                        <option value="openrouter">OpenRouter</option>
                       </>
                     )}
                   </select>
