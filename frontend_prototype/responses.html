@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Responses · Benchmark Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<aside class="side">
+  <a class="brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 14V9M7 14V4M11 14V7M15 14V11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span><b>Benchmark Lab</b><span>LLM evaluation</span></span>
+  </a>
+  <nav class="nav" aria-label="Main">
+    <a href="index.html" >New run</a>
+    <a href="results.html" >Results</a>
+    <a href="responses.html" aria-current="page">Responses</a>
+    <a href="history.html" >Run history</a>
+    <a href="settings.html" >Settings</a>
+  </nav>
+  <div class="side-foot"><b>Baseline set v2026.09</b><br>Captured 20 Sep 2026. Every tier is relative to this version.</div>
+</aside>
+<main>
+  <div class="page-head">
+    <div><h1>Inspect responses</h1><p class="muted">Open any response to see its scores, the rationale, and the evidence behind each flagged claim.</p></div>
+  </div>
+  <div class="grid-2">
+    <section class="panel">
+      <div class="filters">
+        <select aria-label="Model"><option>Qwen3 14B</option><option>Llama 3.3 70B</option></select>
+        <select aria-label="Category"><option>All categories</option><option>Factual / grounded QA</option><option>Coding</option></select>
+        <select aria-label="Show"><option>All responses</option><option>Hallucinations only</option><option>Lowest quality first</option></select>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Prompt</th><th>Category</th><th class="r">Quality</th><th>Flags</th></tr></thead>
+        <tbody>
+          <tr style="background:var(--accent-soft)"><td><a href="#detail">Summarize the 2019 findings on coastal erosion…</a></td><td>Factual QA</td><td class="r num">54</td><td><span class="verdict fab">2 claims</span></td></tr>
+          <tr><td><a href="#detail">Write a function that merges overlapping intervals</a></td><td>Coding</td><td class="r num">96</td><td>None</td></tr>
+          <tr><td><a href="#detail">A train leaves at 9:40 travelling 72 km/h…</a></td><td>Maths</td><td class="r num">88</td><td>None</td></tr>
+          <tr><td><a href="#detail">Who proposed the original design of the bridge in the passage?</a></td><td>Factual QA</td><td class="r num">41</td><td><span class="verdict unsup">1 claim</span></td></tr>
+          <tr><td><a href="#detail">Write a short story set on a night ferry</a></td><td>Creative</td><td class="r num">47</td><td>None</td></tr>
+        </tbody></table></div>
+      <div class="pager"><span>Showing 1–5 of 240</span><span class="btn-row"><a class="btn" href="#">Previous</a><a class="btn" href="#">Next</a></span></div>
+    </section>
+
+    <section class="panel" id="detail">
+      <div class="panel-head"><h2>Response detail</h2><span class="tier mid">Quality 54</span></div>
+      <dl class="kv" style="margin-bottom:16px">
+        <dt>Model</dt><dd>Qwen3 14B</dd><dt>Category</dt><dd>Factual / grounded QA</dd>
+        <dt>Latency</dt><dd class="num">2.4 s total · 0.7 s first token</dd><dt>Tokens</dt><dd class="num">612 in · 388 out</dd>
+        <dt>Groundedness</dt><dd class="num">58%</dd>
+      </dl>
+      <h3 style="margin-bottom:8px">Prompt</h3>
+      <div class="resp" style="margin-bottom:16px">Using only the passage provided, summarize the 2019 findings on coastal erosion.</div>
+      <h3 style="margin-bottom:8px">Response</h3>
+      <div class="resp" style="margin-bottom:18px">The 2019 survey found that erosion rates doubled along the northern shoreline, driven mostly by storm frequency. The authors recommend a 40-metre setback for new buildings.</div>
+      <h3 style="margin-bottom:10px">Flagged claims</h3>
+      <details class="claim" open>
+        <summary><span>“Erosion rates doubled along the northern shoreline”</span><span class="verdict sup">Supported</span></summary>
+        <div class="evidence">Passage, paragraph 2: erosion on the northern shoreline rose from 0.8 to 1.7 m per year.</div>
+      </details>
+      <details class="claim">
+        <summary><span>“Driven mostly by storm frequency”</span><span class="verdict unsup">Unsupported</span></summary>
+        <div class="evidence">The passage lists storms as one factor but never says they were the main one.</div>
+      </details>
+      <details class="claim">
+        <summary><span>“Recommend a 40-metre setback”</span><span class="verdict fab">Fabricated</span></summary>
+        <div class="evidence">No setback distance appears anywhere in the passage. The judge model found no matching sentence.</div>
+      </details>
+      <p class="hint" style="margin-top:12px">Judge rationale: the answer is fluent and mostly on topic, but one claim has no source.</p>
+    </section>
+  </div>
+</main>
+</body></html>

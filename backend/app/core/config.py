@@ -7,8 +7,11 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import List
 
+from dotenv import load_dotenv
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -34,13 +37,15 @@ class Settings(BaseSettings):
     CLOUDFLARE_ACCOUNT_ID: str = ""
     CLOUDFLARE_API_TOKEN: str = ""
     NVIDIA_API_KEY: str = ""
+    XAI_API_KEY: str = ""
+    GROK_API_KEY: str = ""
 
     # -------------------------------------------------------------------------
     # LLM-as-a-Judge — stored per BenchmarkRun for reproducibility (SRS FR-3.5)
     # -------------------------------------------------------------------------
-    JUDGE_PROVIDER: str = "gemini"
-    JUDGE_MODEL: str = "gemini-1.5-flash-latest"
-    JUDGE_MODEL_VERSION: str = "gemini-1.5-flash-001"
+    JUDGE_PROVIDER: str = "cloudflare"
+    JUDGE_MODEL: str = "@cf/meta/llama-3.1-8b-instruct"
+    JUDGE_MODEL_VERSION: str = "llama-3.1-8b-instruct-cf"
 
     # -------------------------------------------------------------------------
     # Security

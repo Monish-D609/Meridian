@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run history · Benchmark Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<aside class="side">
+  <a class="brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 14V9M7 14V4M11 14V7M15 14V11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span><b>Benchmark Lab</b><span>LLM evaluation</span></span>
+  </a>
+  <nav class="nav" aria-label="Main">
+    <a href="index.html" >New run</a>
+    <a href="results.html" >Results</a>
+    <a href="responses.html" >Responses</a>
+    <a href="history.html" aria-current="page">Run history</a>
+    <a href="settings.html" >Settings</a>
+  </nav>
+  <div class="side-foot"><b>Baseline set v2026.09</b><br>Captured 20 Sep 2026. Every tier is relative to this version.</div>
+</aside>
+<main>
+  <div class="page-head">
+    <div><h1>Run history</h1><p class="muted">Reopen any past run with its exact settings and baseline version.</p></div>
+    <a class="btn primary" href="index.html">New run</a>
+  </div>
+  <section class="panel">
+    <div class="table-wrap"><table>
+      <thead><tr><th>Run</th><th>Models</th><th>Baseline</th><th>Status</th><th>Started</th><th></th></tr></thead>
+      <tbody>
+        <tr><td><a href="results.html"><b>Qwen3 14B vs baselines, Oct 2026</b></a></td><td>2 models · 8 categories</td><td class="mono">v2026.09</td><td><span class="status ok">Complete</span></td><td class="small">14 Oct 2026</td><td class="r"><a href="results.html">Open</a></td></tr>
+        <tr><td><a href="results.html"><b>Mistral Small quick check</b></a></td><td>1 model · 4 categories</td><td class="mono">v2026.09</td><td><span class="status run">Running</span></td><td class="small">14 Oct 2026</td><td class="r"><a href="index.html">View progress</a></td></tr>
+        <tr><td><a href="results.html"><b>Gemma 3 27B full suite</b></a></td><td>1 model · 8 categories</td><td class="mono">v2026.06</td><td><span class="status fail">Partial: 1 provider failed</span></td><td class="small">2 Oct 2026</td><td class="r"><a href="results.html">Open</a></td></tr>
+        <tr><td><a href="results.html"><b>Fine-tune comparison</b></a></td><td>3 models · 8 categories</td><td class="mono">v2026.06</td><td><span class="status ok">Complete</span></td><td class="small">21 Sep 2026</td><td class="r"><a href="results.html">Open</a></td></tr>
+      </tbody></table></div>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><h2>Tier over time: Qwen3 14B</h2><span class="hint">Coding category, per baseline version</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Baseline version</th><th>Captured</th><th>Coding tier</th><th class="r">Percentile</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">v2026.09</td><td>20 Sep 2026</td><td><span class="tier strong">Strong</span></td><td class="r num">82</td></tr>
+        <tr><td class="mono">v2026.06</td><td>18 Jun 2026</td><td><span class="tier strong">Strong</span></td><td class="r num">88</td></tr>
+      </tbody></table></div>
+    <p class="hint" style="margin-top:10px">The percentile fell because the newer baseline set contains stronger models, not because the model changed.</p>
+  </section>
+</main>
+</body></html>

@@ -118,8 +118,31 @@ async def list_models(
     q = select(Model).where(Model.is_active == True)
     if provider_id:
         q = q.where(Model.provider_id == provider_id)
-    result = await db.execute(q.order_by(Model.display_name))
-    return result.scalars().all()
+    result = await db.execute(q)
+    models = list(result.scalars().all())
+
+    # Priority rank: Cloudflare -> Gemini -> Grok/xAI -> Groq/NVIDIA -> OpenRouter (lowest)
+    prov_res = await db.execute(select(Provider))
+    providers = {p.id: p.name.lower() for p in prov_res.scalars().all()}
+
+    def provider_priority(model: Model) -> int:
+        p_name = providers.get(model.provider_id, "")
+        if "cloudflare" in p_name:
+            return 1
+        elif "gemini" in p_name or "google" in p_name:
+            return 2
+        elif "grok" in p_name or "xai" in p_name:
+            return 3
+        elif "groq" in p_name:
+            return 4
+        elif "nvidia" in p_name or "nim" in p_name:
+            return 5
+        elif "openrouter" in p_name:
+            return 10  # lowest priority due to heavy rate limits
+        return 6
+
+    models.sort(key=lambda m: (provider_priority(m), m.display_name))
+    return models
 
 
 @router.get("/models/{model_id}", response_model=ModelOut)
@@ -156,3 +179,69 @@ async def list_configured_providers():
     """Return providers that currently have API keys configured."""
     from app.adapters.registry import list_configured_providers
     return {"configured_providers": list_configured_providers()}
+
+
+class ProviderKeyPayload(BaseModel):
+    provider_name: str
+    api_key: str
+    extra: Optional[dict[str, str]] = None
+
+
+@router.post("/providers/key")
+async def update_provider_key(data: ProviderKeyPayload):
+    """
+    Save provider credentials securely to runtime environment and .env file.
+    Updates the adapter registry immediately so changes take effect without server restart.
+    Implements SRS FR-1.3 and PRD credential management.
+    """
+    import os
+    import dotenv
+    from app.adapters.registry import reset_adapters, list_configured_providers
+
+    prov = data.provider_name.lower().strip()
+    env_updates: dict[str, str] = {}
+
+    if "cloudflare" in prov:
+        env_updates["CLOUDFLARE_API_TOKEN"] = data.api_key.strip()
+        if data.extra and data.extra.get("account_id"):
+            env_updates["CLOUDFLARE_ACCOUNT_ID"] = data.extra["account_id"].strip()
+    elif "gemini" in prov or "google" in prov:
+        env_updates["GEMINI_API_KEY"] = data.api_key.strip()
+    elif "grok" in prov or "xai" in prov:
+        env_updates["GROK_API_KEY"] = data.api_key.strip()
+        env_updates["XAI_API_KEY"] = data.api_key.strip()
+    elif "groq" in prov:
+        env_updates["GROQ_API_KEY"] = data.api_key.strip()
+    elif "nvidia" in prov or "nim" in prov:
+        env_updates["NVIDIA_NIM_API_KEY"] = data.api_key.strip()
+    elif "openrouter" in prov:
+        env_updates["OPENROUTER_API_KEY"] = data.api_key.strip()
+    else:
+        key_var = f"{prov.upper()}_API_KEY"
+        env_updates[key_var] = data.api_key.strip()
+
+    # Update in-memory os.environ
+    for k, v in env_updates.items():
+        os.environ[k] = v
+
+    # Persist to .env file
+    env_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../backend/.env"))
+    if not os.path.exists(env_file):
+        env_file = os.path.abspath(".env")
+
+    try:
+        for k, v in env_updates.items():
+            dotenv.set_key(env_file, k, v)
+    except Exception:
+        pass
+
+    # Clear cached singletons so new credentials apply
+    reset_adapters()
+
+    return {
+        "status": "success",
+        "provider": prov,
+        "message": f"Successfully updated credentials for {data.provider_name}",
+        "configured_providers": list_configured_providers(),
+    }
+

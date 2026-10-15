@@ -13,8 +13,15 @@ Seeds:
 from __future__ import annotations
 
 import asyncio
+import sys
 import uuid
 from datetime import datetime, timezone
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -94,6 +101,24 @@ DATASETS: list[dict] = [
         "name": "Meridian Factual QA Benchmark v1",
         "description": "Grounded factual question answering with reference passages.",
         "category_slug": "factual_qa",
+        "task_type": "open",
+        "source_url": "https://github.com/your-org/meridian",
+        "license_info": "MIT",
+        "version_tag": "1.0.0-seed",
+    },
+    {
+        "name": "Meridian Creative Writing Benchmark v1",
+        "description": "Narrative composition, stylistic voice modulation, poetic structure, and creative synthesis.",
+        "category_slug": "creative_writing",
+        "task_type": "open",
+        "source_url": "https://github.com/your-org/meridian",
+        "license_info": "MIT",
+        "version_tag": "1.0.0-seed",
+    },
+    {
+        "name": "Meridian Long-Context Benchmark v1",
+        "description": "Multi-document synthesis, needle-in-a-haystack retrieval, and extended reasoning.",
+        "category_slug": "long_context",
         "task_type": "open",
         "source_url": "https://github.com/your-org/meridian",
         "license_info": "MIT",
@@ -311,6 +336,110 @@ TASKS_BY_DATASET: dict[str, list[dict]] = {
             "context": "Mercury is the planet closest to the Sun...",
         },
     ],
+    "Meridian Creative Writing Benchmark v1": [
+        {
+            "prompt": "Write a three-stanza poem about deep sea exploration from the perspective of an autonomous underwater rover encountering a hydrothermal vent.",
+            "reference_answer": "A three-stanza poem capturing sensory depth, abyssal pressure, geothermal warmth, and robotic observation.",
+            "system_prompt": "You are an imaginative poet.",
+        },
+        {
+            "prompt": "Compose a persuasive opening monologue for a fictional courtroom trial where an AI system argues for its right to self-preservation under human law.",
+            "reference_answer": "A compelling, philosophically structured opening statement exploring consciousness, moral consideration, and legal agency.",
+            "system_prompt": "You are an eloquent defense advocate.",
+        },
+        {
+            "prompt": "Draft a micro-fiction story (under 150 words) about two astronauts on Mars who discover an antique mechanical pocket watch half-buried in ancient sediment.",
+            "reference_answer": "A concise narrative contrasting alien red soil with human horological craftsmanship and the haunting question of who left it.",
+            "system_prompt": "You are a master of flash fiction.",
+        },
+        {
+            "prompt": "Describe a bustling futuristic night market entirely through the sensory details of aromas, resonant acoustics, and tactile sensations, without referencing neon lights or visual color.",
+            "reference_answer": "A sensory description emphasizing sizzle of street food, vapor humidity, heavy machinery hum, and spiced smoke.",
+            "system_prompt": "Focus intensely on non-visual sensory modalities.",
+        },
+        {
+            "prompt": "Write an epistolary exchange consisting of two brief letters between an isolated lighthouse keeper and an amateur radio astronomer who believes the light is pulsing a stellar code.",
+            "reference_answer": "Two letters illustrating isolation, human curiosity, scientific bewilderment, and quiet wonder.",
+            "system_prompt": "You write literary historical fiction.",
+        },
+        {
+            "prompt": "Rewrite Aesop's fable of 'The Tortoise and the Hare' as a gritty, hardboiled detective monologue set in a rainy 1940s metropolis.",
+            "reference_answer": "A noir reimagining with cynical narration, metaphors of slow deliberate gumshoe footwork outlasting flash-in-the-pan grifters.",
+            "system_prompt": "Speak in the voice of a classic noir private eye.",
+        },
+        {
+            "prompt": "Create an evocative soliloquy of a master horologist who realizes their crowning clockwork creation doesn't count seconds, but rather marks the listener's remaining heartbeats.",
+            "reference_answer": "A haunting monologue dealing with mortality, craftsmanship, hubris, and the irrevocable rhythm of time.",
+            "system_prompt": "You are a gothic fiction writer.",
+        },
+        {
+            "prompt": "Write a vivid descriptive passage portraying a shifting coastal island whose topography and tidal lagoons reshape themselves according to the sea's unpredictable moods.",
+            "reference_answer": "Vivid imagery capturing fluid geography, restless salt dunes, and sentient littoral landscapes.",
+            "system_prompt": "Write with poetic, atmospheric prose.",
+        },
+        {
+            "prompt": "Compose a flash fiction piece about the last archivist in an orbital station cataloging extinguished dialects from Earth before transmission blackout.",
+            "reference_answer": "A poignant story on linguistic heritage, silence across deep space, and memory.",
+            "system_prompt": "You write evocative speculative science fiction.",
+        },
+        {
+            "prompt": "Describe the descent of silence over the Atacama Desert radio telescope array as the engineers depart and the midnight cosmic observation cycle begins.",
+            "reference_answer": "A scene depicting silent parabolic dishes, dry high-altitude chill, and reception of electromagnetic whispers from the early universe.",
+            "system_prompt": "Use atmospheric, contemplative prose.",
+        },
+    ],
+    "Meridian Long-Context Benchmark v1": [
+        {
+            "prompt": "Based on the comprehensive clinical trial protocol text below, identify the primary exclusion criteria regarding hepatic function and the required washout period for prior biologic therapies.\n\nContext: CLINICAL TRIAL PROTOCOL STUDY-702 (Phase 2b). Section 4.3 Subject Exclusion Criteria: Subjects are ineligible if serum ALT or AST exceeds 2.5 times the upper limit of normal (ULN), or total bilirubin exceeds 1.5 times ULN with exception of documented Gilbert syndrome. Prior exposure to monoclonal antibody therapies targeting IL-17 or IL-23 requires a mandatory minimum washout period of 16 weeks or 5 half-lives, whichever is longer. Concomitant immunosuppressants must be discontinued at least 28 days before Day 1 randomization.",
+            "reference_answer": "Primary hepatic exclusion criteria: ALT or AST > 2.5x ULN, or total bilirubin > 1.5x ULN (except Gilbert syndrome). Washout period for prior biologic therapies (IL-17/IL-23 monoclonal antibodies): at least 16 weeks or 5 half-lives, whichever is longer.",
+            "context": "CLINICAL TRIAL PROTOCOL STUDY-702 (Phase 2b)...",
+        },
+        {
+            "prompt": "Read the municipal structural inspection report below and extract: (1) The condition rating of Pier 4, (2) The recommended remediation deadline, and (3) The estimated repair cost.\n\nContext: MUNICIPAL INFRASTRUCTURE AUDIT REPORT - HARBOR VIADUCT (Structure ID: HV-409). Inspector: Chief Structural Engineer L. Vance. Inspection Date: August 14, 2026. Findings: Piers 1 through 3 demonstrate minor efflorescence with condition rating Good (Rating 7). Pier 4 exhibits severe longitudinal shear cracking and sub-surface rebar oxidation due to brackish water splash-zone exposure, assigned condition rating Critical (Rating 3). Substructure stability is compromised under maximum dynamic traffic loading. Remediation Recommendation: Full jacket encasement and cathodic protection must be completed no later than November 30, 2026. Preliminary remediation budget allocation is calculated at $1,450,000 USD.",
+            "reference_answer": "(1) Condition rating of Pier 4: Critical (Rating 3). (2) Recommended remediation deadline: November 30, 2026. (3) Estimated repair cost: $1,450,000 USD.",
+            "context": "MUNICIPAL INFRASTRUCTURE AUDIT REPORT - HARBOR VIADUCT...",
+        },
+        {
+            "prompt": "In the multi-department organizational policy document below, what is the exact emergency override passkey for the cryptographic key management enclave?\n\nContext: ENTERPRISE INFRASTRUCTURE SECURITY DIRECTIVE v8.4. Section 9.1: Role-Based Access Controls. Key custodian roles are split between SecOps and CloudArch. In standard operational mode, dual-custody authorization via RSA tokens is required. Under Section 9.4 Disaster Recovery Override Protocols, in the event of complete offline network partition, the physical key safe in Bunker 2 can be accessed using emergency override passkey 'OMEGA-DELTA-9821-CIPHER' alongside dual biometric verification of any two Level-5 officers.",
+            "reference_answer": "OMEGA-DELTA-9821-CIPHER",
+            "context": "ENTERPRISE INFRASTRUCTURE SECURITY DIRECTIVE v8.4...",
+        },
+        {
+            "prompt": "According to the software architecture specification below, which component handles backpressure during peak ingestion spikes, and what is its maximum queue buffer threshold?\n\nContext: REALTIME EVENT INGESTION ARCHITECTURE v3.1. Edge ingest nodes forward raw telemetry directly to the Kafka Ingress Cluster across 48 partitions. When downstream enrichment pipelines experience lag exceeding 1200ms, the Backpressure Coordinator (Component BPC-Engine) activates leaky-bucket throttling. The internal queue buffer threshold for BPC-Engine is configured to a hard ceiling of 2,500,000 uncommitted event payloads. If buffer utilization exceeds 92% of this threshold, graceful drop of debug log level streams is triggered.",
+            "reference_answer": "Component: Backpressure Coordinator (BPC-Engine). Maximum queue buffer threshold: 2,500,000 uncommitted event payloads.",
+            "context": "REALTIME EVENT INGESTION ARCHITECTURE v3.1...",
+        },
+        {
+            "prompt": "Review the legal settlement terms below and determine: Which party pays the arbitration fees, and within how many business days must the initial disbursement be completed?\n\nContext: MUTUAL DISPUTE RESOLUTION AND SETTLEMENT AGREEMENT. Section 11.2 Costs and Disbursements: Notwithstanding any statutory presumption to the contrary, Respondent Global Dynamics LLC agrees to bear 100% of all administrative arbitration fees assessed by JAMS and the neutral umpire's hourly honorarium. The initial mandatory disbursement of $350,000 into the escrow facility shall be wired by Respondent within twelve (12) business days following mutual execution of this instrument.",
+            "reference_answer": "Respondent Global Dynamics LLC pays 100% of the arbitration fees. The initial disbursement must be completed within 12 business days.",
+            "context": "MUTUAL DISPUTE RESOLUTION AND SETTLEMENT AGREEMENT...",
+        },
+        {
+            "prompt": "Extract the name of the research ship that deployed deep sea sensor probe DS-9 and its recorded maximum telemetry depth from the oceanographic survey log below.\n\nContext: EXPEDITION REPORT: PACIFIC ABYSSAL TRANSECT 2026. Chief Scientist: Dr. Elena Rostova. Vessel: Research Vessel RV Oceanus Explorer (IMO 9482155). Cruise 42 Log: Deployments of automated benthic landers occurred between July 3 and July 21. Autonomous deep probe DS-9 was launched at coordinates 14°12'N 142°05'E into the trench margin. DS-9 successfully logged continuous hydrothermal plume telemetry to a maximum verified depth of 8,842 meters below sea level before recovery.",
+            "reference_answer": "Research ship: RV Oceanus Explorer. Maximum recorded depth: 8,842 meters.",
+            "context": "EXPEDITION REPORT: PACIFIC ABYSSAL TRANSECT 2026...",
+        },
+        {
+            "prompt": "Based on the semiconductor fabrication incident log below, identify the contaminated wafer lot ID and the root chemical cause of the micro-fractures.\n\nContext: FAB-7 DEFECT METROLOGY LOG — RUN 4022. During 3nm lithography cycle 88, automated defect inspection detected localized micro-fractures in dielectric film layers on wafer lot WL-9941-X. Failure analysis revealed the root cause was trace contamination of the carrier argon gas by fluorinated hydrocarbons at 18 parts per million, causing anomalous surface etching during chemical vapor deposition.",
+            "reference_answer": "Wafer lot ID: WL-9941-X. Root cause: Trace contamination of carrier argon gas by fluorinated hydrocarbons at 18 ppm.",
+            "context": "FAB-7 DEFECT METROLOGY LOG — RUN 4022...",
+        },
+        {
+            "prompt": "From the planetary astronomy catalog entry below, what is the orbital eccentricity and atmospheric composition of exoplanet Kepler-186f?\n\nContext: EXOPLANETARY SYSTEM CATALOG SHEET — KEPLER-186. Distance from Earth: ~582 light-years in the constellation Cygnus. Kepler-186f is an Earth-sized planet orbiting within the habitable zone of an M-dwarf star. Orbit: semi-major axis is 0.432 AU, orbital period is 129.9 Earth days, and orbital eccentricity is strictly bounded at 0.04. High-resolution transit spectroscopy indicates an atmosphere dominated by molecular nitrogen (74%) and carbon dioxide (22%), with trace water vapor.",
+            "reference_answer": "Orbital eccentricity: 0.04. Atmospheric composition: 74% molecular nitrogen, 22% carbon dioxide, with trace water vapor.",
+            "context": "EXOPLANETARY SYSTEM CATALOG SHEET — KEPLER-186...",
+        },
+        {
+            "prompt": "In the corporate merger prospectus below, what is the agreed exchange ratio of Common Shares, and what is the termination fee if the merger is cancelled without cause?\n\nContext: MERGER PROSPECTUS AND SHAREHOLDER PROXY STATEMENT. Article II: Terms of Transaction. At the Effective Time, each outstanding share of Class A Common Stock of Target Corp shall be converted into the right to receive 0.842 shares of Acquiror Holdings Inc. Section 8.5 Termination Fees: If this Agreement is terminated by Target Corp pursuant to Section 8.2(b) or by Acquiror pursuant to Section 8.3 without cause, a liquidated termination fee of $48,000,000 USD shall be paid by the terminating party within five banking days.",
+            "reference_answer": "Exchange ratio: 0.842 shares of Acquiror for each share of Target Corp. Termination fee: $48,000,000 USD.",
+            "context": "MERGER PROSPECTUS AND SHAREHOLDER PROXY STATEMENT...",
+        },
+        {
+            "prompt": "Read the power grid blackstart procedure below and list: (1) The initial blackstart generator unit designated to energize Substation A, and (2) The maximum allowable frequency deviation during initial load pick-up.\n\nContext: SYSTEM RESTORATION PLAN: GRID REGION NORTH. Protocol BS-01: Primary blackstart responsibility is assigned to the Hydroelectric Station Unit H-3 (capacity 85 MW), capable of starting without external AC grid power using diesel air compressors. Unit H-3 shall energize transmission feeder 230-1 to Substation Alpha. During initial 15 MW customer load pick-up, frequency deviation must not exceed +/- 0.25 Hz from nominal 60.0 Hz; automatic underfrequency shedding relays will trip if frequency drops below 59.5 Hz for > 200ms.",
+            "reference_answer": "(1) Initial blackstart generator unit: Hydroelectric Station Unit H-3 (85 MW). (2) Maximum allowable frequency deviation: +/- 0.25 Hz from nominal 60.0 Hz.",
+            "context": "SYSTEM RESTORATION PLAN: GRID REGION NORTH...",
+        },
+    ],
 }
 
 # ---------------------------------------------------------------------------
@@ -392,6 +521,34 @@ PROVIDERS_AND_MODELS = [
                 "rate_limit_rpm": None,
                 "rate_limit_tpm": None,
             },
+            {
+                "model_id_external": "@cf/mistral/mistral-7b-instruct-v0.1",
+                "display_name": "Mistral 7B Instruct (Cloudflare)",
+                "description": "Mistral 7B v0.1 via Cloudflare Workers AI. Fast free inference.",
+                "rate_limit_rpm": None,
+                "rate_limit_tpm": None,
+            },
+        ],
+    },
+    {
+        "name": "xAI (Grok)",
+        "base_url": "https://api.x.ai/v1",
+        "auth_env_var": "XAI_API_KEY",
+        "models": [
+            {
+                "model_id_external": "grok-2-latest",
+                "display_name": "Grok 2 (xAI)",
+                "description": "Elon Musk / xAI flagship model Grok 2.",
+                "rate_limit_rpm": 60,
+                "rate_limit_tpm": None,
+            },
+            {
+                "model_id_external": "grok-2-mini",
+                "display_name": "Grok 2 Mini (xAI)",
+                "description": "xAI compact and fast Grok 2 Mini model.",
+                "rate_limit_rpm": 60,
+                "rate_limit_tpm": None,
+            },
         ],
     },
 ]
@@ -469,7 +626,7 @@ BASELINE_MODELS = [
 # Seed execution
 # ---------------------------------------------------------------------------
 async def seed(session: AsyncSession) -> None:
-    from sqlalchemy import select
+    from sqlalchemy import func, select
 
     print("🌱 Seeding Meridian database...")
 
@@ -518,7 +675,7 @@ async def seed(session: AsyncSession) -> None:
             print(f"  ⚠ Dataset '{ds_name}' not found; skipping tasks")
             continue
         existing_count = await session.scalar(
-            select(func_count()).select_from(Task).where(Task.dataset_id == dataset.id)
+            select(func.count()).select_from(Task).where(Task.dataset_id == dataset.id)
         )
         if existing_count and existing_count > 0:
             print(f"  ↩ Tasks for '{ds_name}' already seeded ({existing_count} tasks)")
@@ -622,8 +779,6 @@ async def seed(session: AsyncSession) -> None:
     print("🌱 Seeding complete!")
 
 
-# Alias for Task count query
-from sqlalchemy import func as func_count
 
 
 async def main() -> None:

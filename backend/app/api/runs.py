@@ -35,6 +35,7 @@ class RunCreate(BaseModel):
     description: Optional[str] = ""
     max_tokens: int = 1024
     temperature: float = 0.0
+    task_mix_mode: Optional[str] = "standard"
 
 
 class RunOut(BaseModel):
@@ -85,6 +86,7 @@ async def run_progress(run_id: str, db: AsyncSession = Depends(get_db)):
     if not run:
         raise HTTPException(status_code=404, detail="Run not found")
     progress = await get_run_progress(run_id, db)
+    progress["status"] = run.status
     progress["run_status"] = run.status
     return progress
 
@@ -110,6 +112,7 @@ async def create_and_start_run(
             description=data.description or "",
             max_tokens=data.max_tokens,
             temperature=data.temperature,
+            task_mix_mode=data.task_mix_mode or "standard",
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

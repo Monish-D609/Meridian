@@ -15,6 +15,7 @@ from app.adapters.gemini_adapter import GeminiAdapter
 from app.adapters.groq_adapter import GroqAdapter
 from app.adapters.nim_adapter import NIMAdapter
 from app.adapters.openrouter_adapter import OpenRouterAdapter
+from app.adapters.xai_adapter import XAIAdapter
 
 # ---------------------------------------------------------------------------
 # Registry: provider_name → adapter class
@@ -27,10 +28,17 @@ _ADAPTER_CLASSES: dict[str, type[BaseAdapter]] = {
     "cloudflare": CloudflareAdapter,
     "nvidia_nim": NIMAdapter,
     "nim": NIMAdapter,               # alias
+    "xai": XAIAdapter,
+    "grok": XAIAdapter,              # alias
 }
 
 # Singletons (one instance per provider, created on first access)
 _instances: dict[str, BaseAdapter] = {}
+
+
+def reset_adapters() -> None:
+    """Clear cached adapter singletons so new environment credentials take effect."""
+    _instances.clear()
 
 
 def get_adapter(provider_name: str) -> Optional[BaseAdapter]:

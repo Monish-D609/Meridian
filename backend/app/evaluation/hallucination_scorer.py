@@ -137,7 +137,10 @@ async def extract_claims(
     if isinstance(result, AdapterError):
         return []
 
-    raw = result.text.strip()
+    raw = result.text
+    if isinstance(raw, dict):
+        raw = json.dumps(raw)
+    raw = str(raw).strip()
     # Find JSON array in response
     json_match = re.search(r"\[.*?\]", raw, re.DOTALL)
     if not json_match:
@@ -175,7 +178,10 @@ async def verify_claim(
     if isinstance(result, AdapterError):
         return ClaimVerification(claim=claim, verdict="insufficient_info")
 
-    raw = result.text.strip().lower()
+    raw = result.text
+    if isinstance(raw, dict):
+        raw = json.dumps(raw)
+    raw = str(raw).strip().lower()
     if "contradicted" in raw:
         verdict = "contradicted"
     elif "supported" in raw:
@@ -212,7 +218,10 @@ async def score_groundedness_holistic(
     if isinstance(result, AdapterError):
         return None
 
-    raw = result.text.strip()
+    raw = result.text
+    if isinstance(raw, dict):
+        raw = json.dumps(raw)
+    raw = str(raw).strip()
     json_match = re.search(r"\{.*\}", raw, re.DOTALL)
     if not json_match:
         return None
@@ -283,7 +292,7 @@ async def score_hallucination(
 
         if claims:
             verifications: list[ClaimVerification] = []
-            for claim in claims[:10]:   # cap at 10 claims to stay within free-tier rate limits
+            for claim in claims[:3]:   # cap at 3 claims to stay within free-tier rate limits
                 cv = await verify_claim(
                     claim=claim,
                     context=grounding_source,

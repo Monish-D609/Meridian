@@ -26,7 +26,8 @@ React Frontend (served separately — Railway static or Vercel)
 
 | Provider | URL | Notes |
 |---|---|---|
-| **Groq** (fastest, recommended) | https://console.groq.com | Sign up → API Keys |
+| **xAI** (Grok — Elon Musk) | https://console.x.ai | API key for grok-2-latest & grok-2-mini |
+| **Groq** (fast LPU inference) | https://console.groq.com | Sign up → API Keys |
 | **Google AI Studio** (Gemini, LLM-judge) | https://aistudio.google.com/app/apikey | Free, no credit card |
 | **OpenRouter** (many free models) | https://openrouter.ai/keys | Create key, no payment needed for :free models |
 | **Cloudflare Workers AI** | https://dash.cloudflare.com | Get Account ID + API Token |
@@ -57,7 +58,8 @@ Set these in Railway → Project → Variables:
 DATABASE_URL=postgresql+asyncpg://...neon.tech/meridian?sslmode=require
 DATABASE_URL_SYNC=postgresql+psycopg2://...neon.tech/meridian?sslmode=require
 
-# LLM Providers (set at least Groq OR Gemini for the judge)
+# LLM Providers
+XAI_API_KEY=xai-...
 GROQ_API_KEY=gsk_...
 GEMINI_API_KEY=AIza...
 OPENROUTER_API_KEY=sk-or-...
@@ -152,6 +154,19 @@ uvicorn app.main:app --reload --port 8000
 
 # API docs: http://localhost:8000/docs
 ```
+
+### 6b. Start React + TypeScript Frontend
+
+```bash
+cd frontend
+pnpm install     # or npm install
+pnpm run dev     # Starts Vite dev server at http://localhost:5173
+```
+
+- Live Application: `http://localhost:5173/`
+- API Proxy: Automatically forwards `/api` and `/health` requests to `http://127.0.0.1:8000`.
+- Production Build: `pnpm run build`
+
 
 ---
 

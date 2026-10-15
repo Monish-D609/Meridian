@@ -49,7 +49,21 @@ class GeminiAdapter(BaseAdapter):
         if system_prompt:
             payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
 
-        url = f"{self._base_url}/{model_id}:generateContent?key={api_key}"
+        # Strip prefix and resolve model aliases if needed
+        raw_model = model_id.strip()
+        if raw_model.startswith("models/"):
+            raw_model = raw_model[7:]
+
+        ALIASES = {
+            "gemini-1.5-flash": "gemini-2.5-flash",
+            "gemini-1.5-flash-latest": "gemini-2.5-flash",
+            "gemini-1.5-flash-001": "gemini-2.5-flash",
+            "gemini-1.5-pro": "gemini-2.5-pro",
+            "gemini-1.5-pro-latest": "gemini-2.5-pro",
+        }
+        resolved_model = ALIASES.get(raw_model, raw_model)
+
+        url = f"{self._base_url}/{resolved_model}:generateContent?key={api_key}"
 
         start = self._measure_start()
         async with httpx.AsyncClient(timeout=self._timeout) as client:

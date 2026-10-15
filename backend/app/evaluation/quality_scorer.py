@@ -210,7 +210,10 @@ async def llm_judge_quality(
             raw_response="",
         )
 
-    raw = result.text.strip()
+    raw = result.text
+    if isinstance(raw, dict):
+        raw = json.dumps(raw)
+    raw = str(raw).strip()
 
     # Extract JSON from response (model may wrap in markdown)
     json_match = re.search(r"\{.*\}", raw, re.DOTALL)

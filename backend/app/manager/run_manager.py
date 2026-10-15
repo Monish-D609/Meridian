@@ -45,6 +45,7 @@ async def create_run(
     max_tokens: int = 1024,
     temperature: float = 0.0,
     config_overrides: Optional[dict] = None,
+    task_mix_mode: str = "standard",
 ) -> BenchmarkRun:
     """
     Create a new BenchmarkRun and all its pending RunResult cells.
@@ -59,10 +60,19 @@ async def create_run(
         raise ValueError("No active models found for the given model_ids.")
 
     # Load datasets + their tasks
-    tasks_result = await session.execute(
-        select(Task).where(Task.dataset_id.in_(dataset_ids))
-    )
-    tasks = tasks_result.scalars().all()
+    tasks: list[Task] = []
+    if task_mix_mode == "quick":
+        for ds_id in dataset_ids:
+            t_res = await session.execute(
+                select(Task).where(Task.dataset_id == ds_id).order_by(Task.created_at).limit(2)
+            )
+            tasks.extend(t_res.scalars().all())
+    else:
+        tasks_result = await session.execute(
+            select(Task).where(Task.dataset_id.in_(dataset_ids)).order_by(Task.created_at)
+        )
+        tasks = tasks_result.scalars().all()
+
     if not tasks:
         raise ValueError("No tasks found for the given dataset_ids.")
 
@@ -127,114 +137,148 @@ async def execute_run(
     """
     semaphore = asyncio.Semaphore(_MAX_CONCURRENT_CELLS)
 
-    async with session_factory() as session:
-        # Load run
-        run = await session.get(BenchmarkRun, run_id)
-        if run is None:
-            raise ValueError(f"BenchmarkRun {run_id} not found.")
-        run.status = "running"
-        run.started_at = datetime.now(timezone.utc)
-        await session.commit()
+    try:
+        async with session_factory() as session:
+            # Load run
+            run = await session.get(BenchmarkRun, run_id)
+            if run is None:
+                raise ValueError(f"BenchmarkRun {run_id} not found.")
+            run.status = "running"
+            run.started_at = datetime.now(timezone.utc)
+            await session.commit()
 
-    # Load all pending cells
-    async with session_factory() as session:
-        rr_result = await session.execute(
-            select(RunResult)
-            .where(RunResult.run_id == run_id, RunResult.status == "pending")
-        )
-        pending_cells = rr_result.scalars().all()
+        # Load all pending cells
+        async with session_factory() as session:
+            rr_result = await session.execute(
+                select(RunResult)
+                .where(RunResult.run_id == run_id, RunResult.status == "pending")
+            )
+            pending_cells = rr_result.scalars().all()
 
-    # Execute cells concurrently with semaphore
-    async def _execute_one(cell_id: str) -> tuple[str, str]:
-        """Execute one cell in its own session. Returns (cell_id, status)."""
-        async with semaphore:
-            async with session_factory() as cell_session:
-                cell = await cell_session.get(RunResult, cell_id)
-                if cell is None:
+        _db_write_lock = asyncio.Lock()
+
+        # Execute cells concurrently with semaphore
+        async def _execute_one(cell_id: str) -> tuple[str, str]:
+            """Execute one cell in its own session. Returns (cell_id, status)."""
+            async with semaphore:
+                try:
+                    async with session_factory() as cell_session:
+                        cell = await cell_session.get(RunResult, cell_id)
+                        if cell is None:
+                            return cell_id, "failed"
+
+                        # Load task and model details
+                        task = await cell_session.get(Task, cell.task_id)
+                        model = await cell_session.get(Model, cell.model_id)
+
+                        if task is None or model is None:
+                            async with _db_write_lock:
+                                cell.status = "failed"
+                                cell.error_message = "Task or model not found."
+                                await cell_session.commit()
+                            return cell_id, "failed"
+
+                        # Load dataset for task_type
+                        dataset = await cell_session.get(Dataset, task.dataset_id)
+                        task_type = dataset.task_type if dataset else "open"
+
+                        # Load provider name safely without touching lazy relationships
+                        from app.models.models import Provider
+                        provider_obj = await cell_session.get(Provider, model.provider_id)
+                        p_lower = provider_obj.name.lower() if provider_obj else "unknown"
+
+                        if "cloudflare" in p_lower:
+                            adapter_key = "cloudflare"
+                        elif "gemini" in p_lower or "google" in p_lower:
+                            adapter_key = "gemini"
+                        elif "grok" in p_lower or "xai" in p_lower:
+                            adapter_key = "xai"
+                        elif "groq" in p_lower:
+                            adapter_key = "groq"
+                        elif "openrouter" in p_lower:
+                            adapter_key = "openrouter"
+                        elif "nvidia" in p_lower or "nim" in p_lower:
+                            adapter_key = "nvidia_nim"
+                        else:
+                            adapter_key = p_lower.replace(" ", "_")
+
+                        async with _db_write_lock:
+                            cell.status = "running"
+                            await cell_session.commit()
+
+                        status = await execute_cell(
+                            session=cell_session,
+                            run_result=cell,
+                            task_prompt=task.prompt,
+                            task_system_prompt=task.system_prompt,
+                            task_reference_answer=task.reference_answer,
+                            task_context=task.context,
+                            task_type=task_type,
+                            model_external_id=model.model_id_external,
+                            provider_name=adapter_key,
+                        )
+                        async with _db_write_lock:
+                            await cell_session.commit()
+                        return cell_id, status
+                except Exception as exc:
+                    import traceback
+                    print(f"[ERROR] Cell {cell_id} execution failed: {type(exc).__name__}: {exc}")
+                    traceback.print_exc()
+                    try:
+                        async with _db_write_lock:
+                            async with session_factory() as err_session:
+                                c = await err_session.get(RunResult, cell_id)
+                                if c:
+                                    c.status = "failed"
+                                    c.error_message = f"{type(exc).__name__}: {exc}"
+                                    await err_session.commit()
+                    except Exception:
+                        pass
                     return cell_id, "failed"
 
-                # Load task and model details
-                task = await cell_session.get(Task, cell.task_id)
-                model = await cell_session.get(Model, cell.model_id)
+        tasks_coros = [_execute_one(cell.id) for cell in pending_cells]
+        results = await asyncio.gather(*tasks_coros, return_exceptions=True)
 
-                if task is None or model is None:
-                    cell.status = "failed"
-                    cell.error_message = "Task or model not found."
-                    await cell_session.commit()
-                    return cell_id, "failed"
+        # Tally results and update run
+        succeeded = sum(1 for r in results if not isinstance(r, Exception) and r[1] == "succeeded")
+        failed = sum(1 for r in results if isinstance(r, Exception) or r[1] != "succeeded")
 
-                # Load dataset for task_type
-                dataset = await cell_session.get(Dataset, task.dataset_id)
-                task_type = dataset.task_type if dataset else "open"
+        async with session_factory() as session:
+            run = await session.get(BenchmarkRun, run_id)
+            run.succeeded_cells = succeeded
+            run.failed_cells = failed
+            run.status = "completed"
+            run.completed_at = datetime.now(timezone.utc)
+            await session.commit()
 
-                # Load provider name
-                from app.models.models import Provider
-                provider = await cell_session.get(model.provider.__class__, model.provider_id)
+        # Trigger Industry Comparison Engine
+        try:
+            async with session_factory() as session:
+                await _run_industry_comparison(run_id=run_id, session=session)
+        except Exception as comp_exc:
+            print(f"[WARN] Industry comparison error: {comp_exc}")
 
-                # We need the provider name — load it
-                from sqlalchemy import select as sa_select
-                from app.models.models import Provider as ProviderModel
-                prov_result = await cell_session.execute(
-                    sa_select(ProviderModel).where(ProviderModel.id == model.provider_id)
-                )
-                provider_obj = prov_result.scalar_one_or_none()
-                provider_name = provider_obj.name.lower().replace(" ", "_") if provider_obj else "unknown"
-
-                # Map provider display name to adapter key
-                _PROVIDER_NAME_MAP = {
-                    "groq": "groq",
-                    "google_ai_studio": "gemini",
-                    "google": "gemini",
-                    "openrouter": "openrouter",
-                    "cloudflare_workers_ai": "cloudflare",
-                    "cloudflare": "cloudflare",
-                    "nvidia_nim": "nvidia_nim",
-                }
-                adapter_key = _PROVIDER_NAME_MAP.get(provider_name, provider_name)
-
-                cell.status = "running"
-                await cell_session.flush()
-
-                status = await execute_cell(
-                    session=cell_session,
-                    run_result=cell,
-                    task_prompt=task.prompt,
-                    task_system_prompt=task.system_prompt,
-                    task_reference_answer=task.reference_answer,
-                    task_context=task.context,
-                    task_type=task_type,
-                    model_external_id=model.model_id_external,
-                    provider_name=adapter_key,
-                )
-                await cell_session.commit()
-                return cell_id, status
-
-    tasks_coros = [_execute_one(cell.id) for cell in pending_cells]
-    results = await asyncio.gather(*tasks_coros, return_exceptions=True)
-
-    # Tally results and update run
-    succeeded = sum(1 for r in results if not isinstance(r, Exception) and r[1] == "succeeded")
-    failed = sum(1 for r in results if isinstance(r, Exception) or r[1] != "succeeded")
-
-    async with session_factory() as session:
-        run = await session.get(BenchmarkRun, run_id)
-        run.succeeded_cells = succeeded
-        run.failed_cells = failed
-        run.status = "completed"
-        run.completed_at = datetime.now(timezone.utc)
-        await session.commit()
-
-    # Trigger Industry Comparison Engine
-    async with session_factory() as session:
-        await _run_industry_comparison(run_id=run_id, session=session)
-
-    async with session_factory() as session:
-        return await session.get(BenchmarkRun, run_id)
+        async with session_factory() as session:
+            return await session.get(BenchmarkRun, run_id)
+    except Exception as run_exc:
+        print(f"[FATAL] execute_run encountered unhandled exception: {run_exc}")
+        try:
+            async with session_factory() as session:
+                run = await session.get(BenchmarkRun, run_id)
+                if run:
+                    run.status = "failed"
+                    await session.commit()
+        except Exception:
+            pass
+        raise
 
 
 async def get_run_progress(run_id: str, session: AsyncSession) -> dict:
     """Return current progress stats for a run (for polling endpoint)."""
     from sqlalchemy import func, select
+
+    run = await session.get(BenchmarkRun, run_id)
+    run_status = run.status if run else "pending"
 
     result = await session.execute(
         select(
@@ -247,16 +291,41 @@ async def get_run_progress(run_id: str, session: AsyncSession) -> dict:
     rows = result.all()
     status_counts = {row.status: row.count for row in rows}
     total = sum(status_counts.values())
-    done = status_counts.get("succeeded", 0) + status_counts.get("failed", 0) + status_counts.get("quota_exceeded", 0)
+    succeeded_cells = status_counts.get("succeeded", 0)
+    failed_cells = status_counts.get("failed", 0) + status_counts.get("quota_exceeded", 0)
+    done = succeeded_cells + failed_cells
+
+    # Also load brief cell objects so frontend progress tables can render live cells
+    cell_query = await session.execute(
+        select(RunResult.id, RunResult.model_id, RunResult.task_id, RunResult.status, RunResult.latency_ms, RunResult.error_message)
+        .where(RunResult.run_id == run_id)
+    )
+    cells = [
+        {
+            "id": r.id,
+            "model_id": r.model_id,
+            "task_id": r.task_id,
+            "status": r.status,
+            "latency_ms": r.latency_ms,
+            "error_message": r.error_message,
+        }
+        for r in cell_query.all()
+    ]
+
     return {
         "run_id": run_id,
+        "status": run_status,
+        "run_status": run_status,
         "total_cells": total,
         "done_cells": done,
-        "succeeded": status_counts.get("succeeded", 0),
-        "failed": status_counts.get("failed", 0),
+        "succeeded_cells": succeeded_cells,
+        "failed_cells": failed_cells,
+        "succeeded": succeeded_cells,
+        "failed": failed_cells,
         "pending": status_counts.get("pending", 0),
         "running": status_counts.get("running", 0),
         "progress_pct": round(done / total * 100, 1) if total > 0 else 0,
+        "cells": cells,
     }
 
 
@@ -424,4 +493,4 @@ async def _run_industry_comparison(run_id: str, session: AsyncSession) -> None:
         )
         session.add(es_summary)
 
-    await session.flush()
+    await session.commit()

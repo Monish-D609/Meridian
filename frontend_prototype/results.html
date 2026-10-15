@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results · Benchmark Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<aside class="side">
+  <a class="brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 14V9M7 14V4M11 14V7M15 14V11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span><b>Benchmark Lab</b><span>LLM evaluation</span></span>
+  </a>
+  <nav class="nav" aria-label="Main">
+    <a href="index.html" >New run</a>
+    <a href="results.html" aria-current="page">Results</a>
+    <a href="responses.html" >Responses</a>
+    <a href="history.html" >Run history</a>
+    <a href="settings.html" >Settings</a>
+  </nav>
+  <div class="side-foot"><b>Baseline set v2026.09</b><br>Captured 20 Sep 2026. Every tier is relative to this version.</div>
+</aside>
+<main>
+  <div class="page-head">
+    <div><h1>Qwen3 14B vs baselines, Oct 2026</h1>
+    <p class="muted">Run completed 14 Oct 2026 · 240 tasks · 8 categories · baseline set v2026.09</p></div>
+    <div class="btn-row"><a class="btn" href="#">Download CSV</a><a class="btn primary" href="#">Export PDF report</a></div>
+  </div>
+
+  <section class="positioning" aria-labelledby="pos">
+    <div class="who" id="pos">Positioning summary for Qwen3 14B</div>
+    <p class="lead"><span class="strong-t">Strong</span> at coding and maths, <span class="weak-t">weak</span> at long-context and creative writing, with factual answers that hallucinate more than the baseline.</p>
+    <div class="meta"><span>Compared with 5 baseline models</span><span>Baseline v2026.09, captured 20 Sep 2026</span><span>Tiers come from percentile within the baseline set</span></div>
+  </section>
+
+  <div class="axes" aria-label="Metric families">
+    <div class="axis q"><span class="small muted">Quality</span><div class="big">71.4</div><div class="cmp">Baseline median 78.0</div></div>
+    <div class="axis h"><span class="small muted">Hallucination rate</span><div class="big">18.2%</div><div class="cmp">Baseline median 6.1%, about 3× higher</div></div>
+    <div class="axis e"><span class="small muted">Median latency</span><div class="big">2.1 s</div><div class="cmp">First token in 0.6 s</div></div>
+    <div class="axis c"><span class="small muted">Cost per 1,000 tasks</span><div class="big">$0.00</div><div class="cmp">Free tier · $0.42 at list price</div></div>
+  </div>
+
+  <div class="grid-2">
+    <section class="panel">
+      <div class="panel-head"><h2>Tier by capability</h2><span class="hint">Tick on each bar marks the baseline median</span></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Category</th><th>Tier</th><th>Score</th><th class="r">Percentile</th><th class="r">vs median</th></tr></thead>
+        <tbody>
+          <tr><td>Coding</td><td><span class="tier strong">Strong</span></td><td><span class="bar t-strong"><i style="width:82%"></i><b style="left:70%"></b></span></td><td class="r num">82</td><td class="r num delta up">+12</td></tr>
+          <tr><td>Mathematics</td><td><span class="tier strong">Strong</span></td><td><span class="bar t-strong"><i style="width:74%"></i><b style="left:70%"></b></span></td><td class="r num">74</td><td class="r num delta up">+4</td></tr>
+          <tr><td>Reasoning</td><td><span class="tier mid">Mid</span></td><td><span class="bar t-mid"><i style="width:61%"></i><b style="left:70%"></b></span></td><td class="r num">61</td><td class="r num delta down">−9</td></tr>
+          <tr><td>Creative writing</td><td><span class="tier weak">Weak</span></td><td><span class="bar t-weak"><i style="width:38%"></i><b style="left:70%"></b></span></td><td class="r num">38</td><td class="r num delta down">−32</td></tr>
+          <tr><td>Summarization</td><td><span class="tier mid">Mid</span></td><td><span class="bar t-mid"><i style="width:66%"></i><b style="left:70%"></b></span></td><td class="r num">66</td><td class="r num delta down">−4</td></tr>
+          <tr><td>Factual / grounded QA</td><td><span class="tier mid">Mid</span></td><td><span class="bar t-mid"><i style="width:52%"></i><b style="left:70%"></b></span></td><td class="r num">52</td><td class="r num delta down">−18</td></tr>
+          <tr><td>Long-context</td><td><span class="tier weak">Weak</span></td><td><span class="bar t-weak"><i style="width:29%"></i><b style="left:70%"></b></span></td><td class="r num">29</td><td class="r num delta down">−41</td></tr>
+          <tr><td>Instruction following</td><td><span class="tier frontier">Frontier</span></td><td><span class="bar t-frontier"><i style="width:91%"></i><b style="left:70%"></b></span></td><td class="r num">91</td><td class="r num delta up">+21</td></tr>
+        </tbody></table></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Capability profile</h2></div>
+      <svg class="chart" viewBox="0 0 400 320" role="img" aria-label="Radar chart. Coding 82, Mathematics 74, Reasoning 61, Creative writing 38, Summarization 66, Factual QA 52, Long-context 29, against a baseline median of 70 in every category." style="width:100%;height:auto">
+        <g transform="translate(30,0)">
+          <polygon class="ring" points="170,50 256,91.4 277.2,184.5 217.7,259.1 122.3,259.1 62.8,184.5 84,91.4"/>
+          <polygon class="ring" points="170,77.5 234.5,108.6 250.4,178.4 205.8,234.3 134.2,234.3 89.6,178.4 105.5,108.6"/>
+          <polygon class="ring" points="170,105 213,125.7 223.6,172.2 193.9,209.6 146.1,209.6 116.4,172.2 127,125.7"/>
+          <polygon class="ring" points="170,132.5 191.5,142.9 196.8,166.1 181.9,184.8 158.1,184.8 143.2,166.1 148.5,142.9"/>
+          <g class="spoke"><line x1="170" y1="160" x2="170" y2="50"/><line x1="170" y1="160" x2="256" y2="91.4"/><line x1="170" y1="160" x2="277.2" y2="184.5"/><line x1="170" y1="160" x2="217.7" y2="259.1"/><line x1="170" y1="160" x2="122.3" y2="259.1"/><line x1="170" y1="160" x2="62.8" y2="184.5"/><line x1="170" y1="160" x2="84" y2="91.4"/></g>
+          <polygon class="base" points="170,83 230.2,112 245.1,177.1 203.4,229.4 136.6,229.4 94.9,177.1 109.8,112"/>
+          <polygon class="cand" points="170,69.8 233.6,109.3 235.4,174.9 188.1,197.7 138.5,225.4 114.2,172.7 145.1,140.1"/>
+          <text x="170" y="36" text-anchor="middle">Coding</text>
+          <text x="262" y="86" text-anchor="start">Maths</text>
+          <text x="284" y="192" text-anchor="start">Reasoning</text>
+          <text x="217" y="282" text-anchor="middle">Creative writing</text>
+          <text x="122" y="282" text-anchor="middle">Summarization</text>
+          <text x="56" y="192" text-anchor="end">Factual QA</text>
+          <text x="78" y="86" text-anchor="end">Long-context</text>
+        </g>
+      </svg>
+      <div class="legend-row"><span><i class="sw" style="background:var(--accent)"></i>Qwen3 14B</span><span><i class="sw" style="border:1.5px dashed var(--ink-3)"></i>Baseline median</span></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Trade-offs across models</h2><span class="hint">No single “best” model. Pick the trade-off that fits your task.</span></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Model</th><th>Role</th><th class="r">Quality</th><th class="r">Hallucination</th><th class="r">Median latency</th><th class="r">Cost / 1k tasks</th><th class="r">Cost per correct task</th></tr></thead>
+      <tbody>
+        <tr><td><b>Qwen3 14B</b></td><td>Under test</td><td class="r num">71.4</td><td class="r num">18.2%</td><td class="r num">2.1 s</td><td class="r num">$0.00</td><td class="r num">$0.00</td></tr>
+        <tr><td>Llama 3.3 70B</td><td>Under test</td><td class="r num">76.9</td><td class="r num">9.8%</td><td class="r num">3.4 s</td><td class="r num">$0.00</td><td class="r num">$0.00</td></tr>
+        <tr><td>Baseline A</td><td>Baseline</td><td class="r num">84.2</td><td class="r num">4.7%</td><td class="r num">1.8 s</td><td class="r num">$6.10</td><td class="r num">$0.0072</td></tr>
+        <tr><td>Baseline B</td><td>Baseline</td><td class="r num">78.0</td><td class="r num">6.1%</td><td class="r num">1.2 s</td><td class="r num">$0.90</td><td class="r num">$0.0115</td></tr>
+        <tr><td>Baseline C</td><td>Baseline</td><td class="r num">73.5</td><td class="r num">8.3%</td><td class="r num">0.9 s</td><td class="r num">$0.30</td><td class="r num">$0.0041</td></tr>
+      </tbody></table></div>
+    <p class="hint" style="margin-top:12px">Baseline names and figures here are sample data. The real baseline set comes from the registry in Settings.</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Cost against quality</h2></div>
+    <svg class="chart" viewBox="0 0 640 260" role="img" aria-label="Scatter plot of quality against cost per 1,000 tasks for five models" style="width:100%;height:auto;max-height:300px">
+      <g stroke="var(--line)"><line x1="60" y1="20" x2="60" y2="210"/><line x1="60" y1="210" x2="620" y2="210"/></g>
+      <text x="340" y="244" text-anchor="middle">Cost per 1,000 tasks (lower is better)</text>
+      <text x="16" y="115" transform="rotate(-90 16 115)" text-anchor="middle">Quality score</text>
+      <text x="60" y="226">$0</text><text x="620" y="226" text-anchor="end">$7</text>
+      <circle cx="68" cy="110" r="7" fill="var(--accent)"/><text x="82" y="106">Qwen3 14B</text>
+      <circle cx="68" cy="70" r="7" fill="var(--accent)" opacity=".6"/><text x="82" y="66">Llama 3.3 70B</text>
+      <circle cx="580" cy="30" r="7" fill="var(--ink-3)"/><text x="570" y="26" text-anchor="end">Baseline A</text>
+      <circle cx="170" cy="58" r="7" fill="var(--ink-3)"/><text x="184" y="54">Baseline B</text>
+      <circle cx="105" cy="86" r="7" fill="var(--ink-3)"/><text x="119" y="94">Baseline C</text>
+    </svg>
+  </section>
+</main>
+</body></html>

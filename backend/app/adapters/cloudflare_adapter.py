@@ -80,6 +80,11 @@ class CloudflareAdapter(BaseAdapter):
         result = data.get("result", {})
         # Cloudflare returns {"response": "...", "usage": {...}}
         text = result.get("response", "")
+        if isinstance(text, dict):
+            import json
+            text = json.dumps(text)
+        elif not isinstance(text, str):
+            text = str(text) if text is not None else ""
         usage = result.get("usage", {})
 
         return AdapterResponse(

@@ -19,6 +19,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_db
 from app.models.models import BenchmarkRun, EvaluationScore, Model, Report, RunResult
+from app.api.results import get_run_comparison
+from app.reporting.pdf_exporter import build_pdf_report
 
 router = APIRouter()
 
@@ -170,3 +172,33 @@ async def list_reports(run_id: str, db: AsyncSession = Depends(get_db)):
         {"id": r.id, "format": r.format, "file_path": r.file_path, "created_at": r.created_at}
         for r in reports
     ]
+
+
+@router.get("/runs/{run_id}/report/pdf")
+async def download_pdf_report(run_id: str, db: AsyncSession = Depends(get_db)):
+    """
+    Export a publication-quality PDF report for a benchmark run.
+    Implements SRS FR-8.3 and PRD Section 8.
+    """
+    run = await db.get(BenchmarkRun, run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    comp_data = await get_run_comparison(run_id, db)
+
+    buf = build_pdf_report(
+        run_name=comp_data.get("run_name") or run.name,
+        run_id=run.id,
+        run_status=comp_data.get("run_status") or run.status,
+        judge_model=comp_data.get("judge_model") or "Cloudflare / @cf/meta/llama-3.1-8b-instruct",
+        judge_version=comp_data.get("judge_model_version") or "v1.0.0",
+        models=comp_data.get("models") or [],
+    )
+
+    filename = f"meridian_report_{run_id[:8]}_{datetime.now(timezone.utc).strftime('%Y%m%d')}.pdf"
+    return StreamingResponse(
+        buf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+

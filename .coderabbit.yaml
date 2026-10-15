@@ -1,0 +1,59 @@
+# CodeRabbit Configuration
+# Docs: https://docs.coderabbit.ai/getting-started/yaml-configuration
+# Install the GitHub App first: https://coderabbit.ai
+
+language: "en-US"
+
+# Tone and review style
+tone_instructions: "Be concise and actionable. Focus on correctness, security, and maintainability. Skip nitpicks unless they affect readability significantly."
+
+early_access: false
+
+# Review settings
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  # Auto-review on all PRs
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+      - "master"
+      - "develop"
+
+  # Path-based instructions
+  path_instructions:
+    - path: "**/*.ts"
+      instructions: "Review for TypeScript best practices: proper typing, no use of 'any', prefer interfaces over type aliases for objects."
+    - path: "**/*.tsx"
+      instructions: "Review React components for hooks rules, prop typing, and accessibility (aria attributes, semantic HTML)."
+    - path: "**/*.test.*"
+      instructions: "Check test coverage is meaningful, not just checking that functions exist. Look for edge cases."
+    - path: "**/api/**"
+      instructions: "Review for input validation, proper error responses (correct HTTP status codes), and authentication checks."
+    - path: "**/*.sql"
+      instructions: "Review for SQL injection risks, N+1 query patterns, and missing indexes on foreign keys."
+
+  # Labeling
+  labeling:
+    enabled: true
+
+# Chat / comment settings
+chat:
+  auto_reply: true
+
+# Knowledge base — CodeRabbit can learn from past reviews
+knowledge_base:
+  learnings:
+    scope: "auto"
+  issues:
+    scope: "auto"
+  pull_requests:
+    scope: "auto"

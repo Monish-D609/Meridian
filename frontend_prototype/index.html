@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New run · Benchmark Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<aside class="side">
+  <a class="brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 14V9M7 14V4M11 14V7M15 14V11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <span><b>Benchmark Lab</b><span>LLM evaluation</span></span>
+  </a>
+  <nav class="nav" aria-label="Main">
+    <a href="index.html" aria-current="page">New run</a>
+    <a href="results.html" >Results</a>
+    <a href="responses.html" >Responses</a>
+    <a href="history.html" >Run history</a>
+    <a href="settings.html" >Settings</a>
+  </nav>
+  <div class="side-foot"><b>Baseline set v2026.09</b><br>Captured 20 Sep 2026. Every tier is relative to this version.</div>
+</aside>
+<main>
+  <div class="page-head">
+    <div><h1>Start a benchmark run</h1>
+    <p class="muted">Defaults are preselected, so you can launch a run straight away. Adjust anything you like first.</p></div>
+  </div>
+
+  <form action="results.html" class="grid-2">
+    <div class="stack">
+      <section class="panel">
+        <div class="panel-head"><h2>Models to test</h2><span class="hint">Pick one or more</span></div>
+        <div class="choices">
+          <label class="choice"><input type="checkbox" name="m" checked><div><b>Qwen3 14B</b><span>OpenRouter · free</span></div></label>
+          <label class="choice"><input type="checkbox" name="m" checked><div><b>Llama 3.3 70B</b><span>NVIDIA NIM · free credits</span></div></label>
+          <label class="choice"><input type="checkbox" name="m"><div><b>Mistral Small</b><span>OpenRouter · free</span></div></label>
+          <label class="choice"><input type="checkbox" name="m"><div><b>Gemma 3 27B</b><span>Cloudflare Workers AI</span></div></label>
+          <label class="choice"><input type="checkbox" name="m" disabled><div><b>GPT-4.1</b><span>Add an API key in Settings</span></div></label>
+          <label class="choice"><input type="checkbox" name="m" disabled><div><b>Add a custom model</b><span>Any provider adapter</span></div></label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Capability categories</h2><span class="hint">Each task counts toward one category</span></div>
+        <div class="choices">
+          <label class="choice"><input type="checkbox" checked><div><b>Coding</b><span>HumanEval-style</span></div></label>
+          <label class="choice"><input type="checkbox" checked><div><b>Mathematics</b><span>GSM8K-style</span></div></label>
+          <label class="choice"><input type="checkbox" checked><div><b>Reasoning</b><span>Multi-step logic</span></div></label>
+          <label class="choice"><input type="checkbox" checked><div><b>Creative writing</b><span>Rubric-judged</span></div></label>
+          <label class="choice"><input type="checkbox" checked><div><b>Summarization</b><span>Source-faithful</span></div></label>
+          <label class="choice"><input type="checkbox" checked><div><b>Factual / grounded QA</b><span>Claim-level checks</span></div></label>
+          <label class="choice"><input type="checkbox" checked><div><b>Long-context</b><span>Out-of-context reasoning</span></div></label>
+          <label class="choice"><input type="checkbox" checked><div><b>Instruction following</b><span>Constraint checks</span></div></label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Dataset</h2></div>
+        <fieldset>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="d" checked><div><b>Standard suite</b><span>Built-in prompts, about 240 tasks</span></div></label>
+            <label class="choice"><input type="radio" name="d"><div><b>Quick check</b><span>Around 40 tasks, finishes fast</span></div></label>
+            <label class="choice"><input type="radio" name="d"><div><b>Upload my own</b><span>CSV or JSONL</span></div></label>
+          </div>
+        </fieldset>
+        <div class="field" style="margin-bottom:0">
+          <label for="file">Custom dataset file</label>
+          <input id="file" type="file" accept=".csv,.jsonl,.json">
+          <span class="hint">Columns: prompt, reference (optional), source_context (optional), category.</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="stack">
+      <section class="panel">
+        <div class="panel-head"><h2>Run settings</h2></div>
+        <div class="field"><label for="name">Run name</label><input id="name" type="text" value="Qwen3 14B vs baselines, Oct 2026"></div>
+        <div class="row-2">
+          <div class="field"><label for="temp">Temperature</label><input id="temp" type="number" step="0.1" min="0" max="2" value="0.2"></div>
+          <div class="field"><label for="maxtok">Max output tokens</label><input id="maxtok" type="number" value="1024"></div>
+        </div>
+        <div class="field"><label for="base">Compare against baseline set</label>
+          <select id="base"><option>v2026.09 — captured 20 Sep 2026</option><option>v2026.06 — captured 18 Jun 2026</option></select>
+          <span class="hint">Tiers are only valid for the baseline version you choose here.</span></div>
+        <fieldset>
+          <label class="legend" style="display:block;margin-bottom:8px">Extra checks</label>
+          <label class="choice" style="display:block;margin-bottom:8px"><input type="checkbox" checked><div><b>Claim-level hallucination check</b><span>Slower, but flags each unsupported claim</span></div></label>
+          <label class="choice" style="display:block"><input type="checkbox"><div><b>Consistency scoring</b><span>Re-run 10% of prompts three times</span></div></label>
+        </fieldset>
+        <div class="callout" style="margin-bottom:16px">Estimated: <b>≈ 480 requests</b>, about 14 minutes, <b>$0.00</b> on free tiers.</div>
+        <div class="btn-row"><button class="btn primary" type="submit">Start run</button><button class="btn" type="reset">Reset</button></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Live progress</h2><span class="status run">Running</span></div>
+        <p class="small muted" style="margin-bottom:12px">Example of what you see after starting. One model failing never stops the others.</p>
+        <div class="key-line"><span>Qwen3 14B</span><span class="small num">168 / 240</span></div>
+        <div class="progress" style="margin:4px 0 12px"><i style="width:70%"></i></div>
+        <div class="key-line"><span>Llama 3.3 70B</span><span class="small num">121 / 240</span></div>
+        <div class="progress" style="margin:4px 0 12px"><i style="width:50%"></i></div>
+        <div class="key-line"><span>Mistral Small</span><span class="status fail">Rate-limited, retrying</span></div>
+      </section>
+    </div>
+  </form>
+</main>
+</body></html>
