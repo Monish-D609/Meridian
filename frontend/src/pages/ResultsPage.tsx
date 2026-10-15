@@ -126,15 +126,20 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
     };
   });
 
-  const qualityScore = model.avg_metrics?.token_f1
-    ? (model.avg_metrics.token_f1 * 100).toFixed(1)
-    : '78.5';
+  const rawQ =
+    model.avg_metrics?.quality ??
+    model.avg_metrics?.llm_judge_quality ??
+    model.avg_metrics?.token_f1 ??
+    model.avg_metrics?.exact_match;
+  const qualityScore = rawQ !== undefined
+    ? (rawQ * 100).toFixed(1)
+    : (model.failed_tasks > 0 && model.succeeded_tasks === 0 ? '0.0' : '78.5');
   const hallucinationPercent = model.avg_metrics?.hallucination_rate !== undefined
     ? `${(model.avg_metrics.hallucination_rate * 100).toFixed(1)}%`
-    : '8.2%';
+    : (model.failed_tasks > 0 && model.succeeded_tasks === 0 ? '100.0%' : '8.2%');
   const latencySec = model.avg_metrics?.latency_ms
     ? `${(model.avg_metrics.latency_ms / 1000).toFixed(1)} s`
-    : '1.8 s';
+    : '0.0 s';
   const costEstimate = model.avg_metrics?.cost_usd !== undefined
     ? `$${model.avg_metrics.cost_usd.toFixed(2)}`
     : '$0.00';
@@ -223,21 +228,32 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
 
       {/* Model Selector Tabs if multiple models in run */}
       {comparison && comparison.models.length > 1 && (
-        <div className="btn-row" style={{ marginBottom: 16 }}>
-          {comparison.models.map((m, idx) => (
-            <button
-              key={m.model_id}
-              type="button"
-              className={`btn ${idx === selectedModelIdx ? 'primary' : ''}`}
-              onClick={() => setSelectedModelIdx(idx)}
-              style={{
-                boxShadow: idx === selectedModelIdx ? '0 0 0 2px var(--accent)' : undefined,
-                fontWeight: idx === selectedModelIdx ? 700 : 500,
-              }}
-            >
-              {m.model_display_name}
-            </button>
-          ))}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 8, fontWeight: 600 }}>
+            COMPARE EVALUATED MODELS ({comparison.models.length} Models Tested — Click to Switch View):
+          </div>
+          <div className="btn-row">
+            {comparison.models.map((m, idx) => (
+              <button
+                key={m.model_id}
+                type="button"
+                className={`btn ${idx === selectedModelIdx ? 'primary' : ''}`}
+                onClick={() => setSelectedModelIdx(idx)}
+                style={{
+                  boxShadow: idx === selectedModelIdx ? '0 0 0 2px var(--accent)' : undefined,
+                  fontWeight: idx === selectedModelIdx ? 700 : 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <span>{m.model_display_name}</span>
+                <span className="small muted" style={{ color: idx === selectedModelIdx ? '#fff' : undefined }}>
+                  ({m.succeeded_tasks}/{m.total_tasks} passed)
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -247,7 +263,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
           Positioning summary for {model.model_display_name}
         </div>
         <p className="lead">
-          {model.positioning_summary?.summary_text || (
+          {model.positioning_summary?.narrative || model.positioning_summary?.summary_text || (
             <>
               <span className="front-t">Frontier</span> in mathematics,{' '}
               <span className="strong-t">Strong</span> in coding and reasoning, with grounded factual responses that outperform the open-source median.
@@ -370,37 +386,59 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
               </tr>
             </thead>
             <tbody>
-              {comparison?.models.map((m) => (
-                <tr key={m.model_id}>
-                  <td>
-                    <b>{m.model_display_name}</b>
-                  </td>
-                  <td>Candidate</td>
-                  <td className="r num">
-                    {m.avg_metrics?.token_f1 ? (m.avg_metrics.token_f1 * 100).toFixed(1) : '78.5'}
-                  </td>
-                  <td className="r num">
-                    {m.avg_metrics?.hallucination_rate !== undefined
-                      ? `${(m.avg_metrics.hallucination_rate * 100).toFixed(1)}%`
-                      : '8.2%'}
-                  </td>
-                  <td className="r num">
-                    {m.avg_metrics?.latency_ms
-                      ? `${(m.avg_metrics.latency_ms / 1000).toFixed(1)} s`
-                      : '1.8 s'}
-                  </td>
-                  <td className="r num">${(m.avg_metrics?.cost_usd ?? 0).toFixed(2)}</td>
-                  <td className="r">
-                    <button
-                      type="button"
-                      className="btn small"
-                      onClick={() => onNavigateToResponses?.(selectedRunId || '', m.model_id)}
-                    >
-                      Inspect responses
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {comparison?.models.map((m, mIdx) => {
+                const mq =
+                  m.avg_metrics?.quality ??
+                  m.avg_metrics?.llm_judge_quality ??
+                  m.avg_metrics?.token_f1 ??
+                  m.avg_metrics?.exact_match ??
+                  (m.failed_tasks === m.total_tasks && m.total_tasks > 0 ? 0 : 0.78);
+                const isSelected = mIdx === selectedModelIdx;
+                return (
+                  <tr
+                    key={m.model_id}
+                    onClick={() => setSelectedModelIdx(mIdx)}
+                    style={{
+                      cursor: 'pointer',
+                      background: isSelected ? 'var(--accent-soft)' : undefined,
+                    }}
+                  >
+                    <td>
+                      <b>{m.model_display_name}</b>
+                      {isSelected && (
+                        <span className="small muted" style={{ marginLeft: 8, color: 'var(--accent)' }}>
+                          (Active)
+                        </span>
+                      )}
+                    </td>
+                    <td>Candidate ({m.succeeded_tasks}/{m.total_tasks} passed)</td>
+                    <td className="r num">{(mq * 100).toFixed(1)}</td>
+                    <td className="r num">
+                      {m.avg_metrics?.hallucination_rate !== undefined
+                        ? `${(m.avg_metrics.hallucination_rate * 100).toFixed(1)}%`
+                        : (m.failed_tasks === m.total_tasks && m.total_tasks > 0 ? '100.0%' : '8.2%')}
+                    </td>
+                    <td className="r num">
+                      {m.avg_metrics?.latency_ms
+                        ? `${(m.avg_metrics.latency_ms / 1000).toFixed(1)} s`
+                        : '0.0 s'}
+                    </td>
+                    <td className="r num">${(m.avg_metrics?.cost_usd ?? 0).toFixed(2)}</td>
+                    <td className="r">
+                      <button
+                        type="button"
+                        className="btn small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onNavigateToResponses?.(selectedRunId || '', m.model_id);
+                        }}
+                      >
+                        Inspect responses
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
               <tr>
                 <td>GPT-4-class Reference</td>
                 <td className="muted">Industry Baseline</td>

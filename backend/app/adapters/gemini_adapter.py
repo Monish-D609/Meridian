@@ -49,33 +49,55 @@ class GeminiAdapter(BaseAdapter):
         if system_prompt:
             payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
 
-        # Strip prefix and resolve model aliases if needed
+        # Strip prefix and resolve model aliases to working Google AI Studio models
         raw_model = model_id.strip()
         if raw_model.startswith("models/"):
             raw_model = raw_model[7:]
 
+        # Map legacy or deprecated aliases to active working Google AI Studio models
+        # (gemini-3.5-flash and gemini-3.6-flash are active and verified on AI Studio v1beta)
         ALIASES = {
-            "gemini-1.5-flash": "gemini-2.5-flash",
-            "gemini-1.5-flash-latest": "gemini-2.5-flash",
-            "gemini-1.5-flash-001": "gemini-2.5-flash",
-            "gemini-1.5-pro": "gemini-2.5-pro",
-            "gemini-1.5-pro-latest": "gemini-2.5-pro",
+            "gemini-1.5-flash": "gemini-3.5-flash",
+            "gemini-1.5-flash-latest": "gemini-3.5-flash",
+            "gemini-1.5-flash-001": "gemini-3.5-flash",
+            "gemini-2.0-flash": "gemini-3.5-flash",
+            "gemini-2.5-flash": "gemini-3.5-flash",
+            "gemini-flash-latest": "gemini-3.5-flash",
+            "gemini-1.5-pro": "gemini-3.5-flash",
+            "gemini-1.5-pro-latest": "gemini-3.5-flash",
+            "gemini-2.5-pro": "gemini-3.5-flash",
         }
         resolved_model = ALIASES.get(raw_model, raw_model)
-
-        url = f"{self._base_url}/{resolved_model}:generateContent?key={api_key}"
+        models_to_try = [resolved_model]
+        if resolved_model != "gemini-3.6-flash":
+            models_to_try.append("gemini-3.6-flash")
 
         start = self._measure_start()
+        last_error = None
+        data = None
+
         async with httpx.AsyncClient(timeout=self._timeout) as client:
-            response = await client.post(
-                url,
-                headers={"Content-Type": "application/json"},
-                json=payload,
-            )
-            response.raise_for_status()
+            for target_model in models_to_try:
+                url = f"{self._base_url}/{target_model}:generateContent?key={api_key}"
+                try:
+                    response = await client.post(
+                        url,
+                        headers={"Content-Type": "application/json"},
+                        json=payload,
+                    )
+                    if response.status_code == 200:
+                        data = response.json()
+                        break
+                    else:
+                        last_error = f"Gemini API returned status {response.status_code}: {response.text[:180]}"
+                except Exception as ex:
+                    last_error = str(ex)
+
+        if data is None:
+            raise RuntimeError(f"All Gemini model candidates failed. Last error: {last_error}")
 
         latency_ms = self._measure_latency_ms(start)
-        data = response.json()
+
 
         # Extract text from first candidate
         candidates = data.get("candidates", [])

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
-import type { RunResult, Model } from '../types';
+import type { RunResult, Model, BenchmarkRun } from '../types';
 
 interface ResponseClaim {
   text: string;
@@ -30,6 +30,8 @@ interface ResponsesPageProps {
 }
 
 export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, initialModelId }) => {
+  const [runs, setRuns] = useState<BenchmarkRun[]>([]);
+  const [activeRunId, setActiveRunId] = useState<string | undefined>(initialRunId);
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>(initialModelId || '');
   const [categoryFilter, setCategoryFilter] = useState('All categories');
@@ -38,32 +40,33 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
-    async function loadModels() {
+    async function loadInitial() {
       try {
-        const mods = await api.getModels();
-        setModels(mods);
-        if (!selectedModel && mods.length > 0) {
-          setSelectedModel(mods[0].id);
+        const [runList, modList] = await Promise.all([api.getRuns(), api.getModels()]);
+        setRuns(runList);
+        setModels(modList);
+        if (!activeRunId && runList.length > 0) {
+          setActiveRunId(runList[0].id);
         }
       } catch (err) {
-        console.error('Failed to load models for responses:', err);
+        console.error('Failed to load runs/models for responses:', err);
       }
     }
-    loadModels();
-  }, []);
+    loadInitial();
+  }, [initialRunId]);
 
   useEffect(() => {
     async function loadResults() {
-      if (!initialRunId) return;
+      if (!activeRunId) return;
       try {
-        const res = await api.getRunResults(initialRunId, selectedModel || undefined);
+        const res = await api.getRunResults(activeRunId, selectedModel ? selectedModel : undefined);
         setResults(res);
       } catch (err) {
         console.error('Failed to load run results:', err);
       }
     }
     loadResults();
-  }, [initialRunId, selectedModel]);
+  }, [activeRunId, selectedModel]);
 
   // Demo responses fallback if no active run results exist yet
   const sampleResponses: DisplayItem[] = [
@@ -165,29 +168,78 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
   ];
 
   const rawItems: DisplayItem[] = results.length > 0
-    ? results.map((r, i) => ({
-        id: r.id || `resp-${i}`,
-        model: selectedModel || 'Evaluated Model',
-        category: 'Live Evaluation',
-        quality: r.status === 'succeeded' ? 88 : 25,
-        groundedness: r.status === 'succeeded' ? '92%' : '0%',
-        latency: `${r.latency_ms ? (r.latency_ms / 1000).toFixed(2) : '1.2'} s`,
-        tokens: `${r.input_tokens || 0} in · ${r.output_tokens || 0} out`,
-        prompt: `Evaluation Task (${r.task_id.slice(0, 8)})`,
-        response: r.response_text || r.error_message || 'No response returned.',
-        flags: r.status === 'succeeded' ? 'None' : 'Error',
-        flagType: r.status === 'succeeded' ? 'ok' : 'fab',
-        claims: [],
-      }))
+    ? results.map((r, i) => {
+        const isSucceeded = r.status === 'succeeded';
+        const hasHal = Boolean(
+          r.has_hallucination ||
+          (r.hallucination_rate && r.hallucination_rate > 0.15) ||
+          (r.claims && r.claims.some((c) => c.verdict === 'contradicted'))
+        );
+        const hasUnsup = Boolean(r.claims && r.claims.some((c) => c.verdict === 'insufficient_info'));
+
+        let flagType = 'ok';
+        let flags = 'None';
+        if (!isSucceeded) {
+          flagType = 'err';
+          flags = 'Error';
+        } else if (hasHal) {
+          flagType = 'fab';
+          const count = r.claims ? r.claims.filter(c => c.verdict === 'contradicted').length : 0;
+          flags = count > 0 ? `${count} claim${count > 1 ? 's' : ''}` : `${Math.round((r.hallucination_rate || 0.2) * 100)}% hal`;
+        } else if (hasUnsup) {
+          flagType = 'unsup';
+          flags = 'Unsupported';
+        }
+
+        const modelName = models.find((m) => m.id === r.model_id)?.display_name || r.model_name || 'Evaluated Model';
+
+        const claimsMapped: ResponseClaim[] = (r.claims || []).map((c) => {
+          const isContra = c.verdict === 'contradicted';
+          const isUnsup = c.verdict === 'insufficient_info';
+          return {
+            text: c.claim,
+            verdict: isContra ? 'Fabricated' : isUnsup ? 'Unsupported' : 'Supported',
+            verdictClass: isContra ? 'fab' : isUnsup ? 'unsup' : 'ok',
+            evidence: isContra ? 'Contradicts ground truth reference.' : isUnsup ? 'Insufficient reference information.' : 'Supported by reference evidence.',
+          };
+        });
+
+        return {
+          id: r.id || `resp-${i}`,
+          model: modelName,
+          category: r.category_name || 'Reasoning',
+          quality: r.quality_score !== undefined && r.quality_score !== null
+            ? Math.round(r.quality_score * 100)
+            : (isSucceeded ? 85 : 0),
+          groundedness: r.groundedness_score !== undefined && r.groundedness_score !== null
+            ? `${Math.round(r.groundedness_score * 100)}%`
+            : (isSucceeded ? '92%' : '0%'),
+          latency: `${r.latency_ms ? (r.latency_ms / 1000).toFixed(2) : '1.2'} s`,
+          tokens: `${r.input_tokens || 0} in · ${r.output_tokens || 0} out`,
+          prompt: r.task_prompt || `Evaluation Task (${r.task_id.slice(0, 8)})`,
+          response: r.response_text || r.error_message || 'No response returned.',
+          flags,
+          flagType,
+          claims: claimsMapped,
+        };
+      })
     : sampleResponses;
 
   // Filter items based on active dropdown selections
   let filteredItems = rawItems.filter((item) => {
-    if (categoryFilter !== 'All categories' && item.category !== categoryFilter) {
-      return false;
+    if (categoryFilter !== 'All categories') {
+      const target = categoryFilter.toLowerCase().trim();
+      const cat = item.category.toLowerCase().trim();
+      const match =
+        cat === target ||
+        cat.includes(target.replace(' factual', '').replace(' qa', '')) ||
+        target.includes(cat);
+      if (!match) return false;
     }
-    if (viewFilter === 'Hallucinations only' && item.flagType === 'ok') {
-      return false;
+    if (viewFilter === 'Hallucinations only') {
+      if (item.flagType !== 'fab' && item.flagType !== 'unsup') {
+        return false;
+      }
     }
     return true;
   });
@@ -199,7 +251,7 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
   const safeIndex = Math.min(selectedIndex, Math.max(0, filteredItems.length - 1));
   const current = filteredItems[safeIndex] || {
     id: 'empty',
-    model: selectedModel || 'No Model',
+    model: selectedModel ? (models.find(m => m.id === selectedModel)?.display_name || selectedModel) : 'All Models',
     category: categoryFilter,
     quality: 0,
     groundedness: '0%',
@@ -221,6 +273,25 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
             Open any prompt execution to see its raw response, quality score, rationale, and atomic claim verification evidence.
           </p>
         </div>
+        {runs.length > 1 && (
+          <div className="btn-row">
+            <select
+              aria-label="Select Run"
+              value={activeRunId}
+              onChange={(e) => {
+                setActiveRunId(e.target.value);
+                setSelectedIndex(0);
+              }}
+              style={{ width: 'auto' }}
+            >
+              {runs.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name} ({r.status})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="grid-2">
@@ -234,12 +305,12 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
                 setSelectedIndex(0);
               }}
             >
+              <option value="">All evaluated models</option>
               {models.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.display_name}
                 </option>
               ))}
-              {models.length === 0 && <option>Grok 2 (xAI)</option>}
             </select>
 
             <select
@@ -251,10 +322,13 @@ export const ResponsesPage: React.FC<ResponsesPageProps> = ({ initialRunId, init
               }}
             >
               <option>All categories</option>
-              <option>Factual QA</option>
               <option>Coding</option>
               <option>Mathematics</option>
               <option>Reasoning</option>
+              <option>Factual QA</option>
+              <option>Creative Writing</option>
+              <option>Summarization</option>
+              <option>Long-Context</option>
             </select>
 
             <select

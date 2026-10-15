@@ -82,13 +82,23 @@ export interface RunResult {
   id: string;
   run_id: string;
   model_id: string;
+  model_name?: string;
   task_id: string;
+  task_prompt?: string;
+  task_reference_answer?: string;
+  category_name?: string;
+  category_slug?: string;
   status: string;
   response_text?: string;
   input_tokens?: number;
   output_tokens?: number;
   latency_ms?: number;
   error_message?: string;
+  quality_score?: number;
+  groundedness_score?: number;
+  hallucination_rate?: number;
+  claims?: Array<{ claim: string; verdict: string }>;
+  has_hallucination?: boolean;
 }
 
 export interface BaselineModel {
