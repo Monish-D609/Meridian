@@ -530,27 +530,6 @@ PROVIDERS_AND_MODELS = [
             },
         ],
     },
-    {
-        "name": "xAI (Grok)",
-        "base_url": "https://api.x.ai/v1",
-        "auth_env_var": "XAI_API_KEY",
-        "models": [
-            {
-                "model_id_external": "grok-2-latest",
-                "display_name": "Grok 2 (xAI)",
-                "description": "Elon Musk / xAI flagship model Grok 2.",
-                "rate_limit_rpm": 60,
-                "rate_limit_tpm": None,
-            },
-            {
-                "model_id_external": "grok-2-mini",
-                "display_name": "Grok 2 Mini (xAI)",
-                "description": "xAI compact and fast Grok 2 Mini model.",
-                "rate_limit_rpm": 60,
-                "rate_limit_tpm": None,
-            },
-        ],
-    },
 ]
 
 # ---------------------------------------------------------------------------

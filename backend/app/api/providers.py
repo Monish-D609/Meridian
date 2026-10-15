@@ -121,7 +121,7 @@ async def list_models(
     result = await db.execute(q)
     models = list(result.scalars().all())
 
-    # Priority rank: Cloudflare -> Gemini -> Grok/xAI -> Groq/NVIDIA -> OpenRouter (lowest)
+    # Priority rank: Cloudflare -> Gemini -> Groq -> OpenRouter (lowest)
     prov_res = await db.execute(select(Provider))
     providers = {p.id: p.name.lower() for p in prov_res.scalars().all()}
 
@@ -131,15 +131,11 @@ async def list_models(
             return 1
         elif "gemini" in p_name or "google" in p_name:
             return 2
-        elif "grok" in p_name or "xai" in p_name:
-            return 3
         elif "groq" in p_name:
-            return 4
-        elif "nvidia" in p_name or "nim" in p_name:
-            return 5
+            return 3
         elif "openrouter" in p_name:
-            return 10  # lowest priority due to heavy rate limits
-        return 6
+            return 4
+        return 5
 
     models.sort(key=lambda m: (provider_priority(m), m.display_name))
     return models
@@ -207,13 +203,8 @@ async def update_provider_key(data: ProviderKeyPayload):
             env_updates["CLOUDFLARE_ACCOUNT_ID"] = data.extra["account_id"].strip()
     elif "gemini" in prov or "google" in prov:
         env_updates["GEMINI_API_KEY"] = data.api_key.strip()
-    elif "grok" in prov or "xai" in prov:
-        env_updates["GROK_API_KEY"] = data.api_key.strip()
-        env_updates["XAI_API_KEY"] = data.api_key.strip()
     elif "groq" in prov:
         env_updates["GROQ_API_KEY"] = data.api_key.strip()
-    elif "nvidia" in prov or "nim" in prov:
-        env_updates["NVIDIA_NIM_API_KEY"] = data.api_key.strip()
     elif "openrouter" in prov:
         env_updates["OPENROUTER_API_KEY"] = data.api_key.strip()
     else:
