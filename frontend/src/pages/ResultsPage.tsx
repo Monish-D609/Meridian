@@ -70,9 +70,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
 
   // Fallback demo model if no live run comparison exists yet
   const model: ModelSummary = comparison?.models[selectedModelIdx] || {
-    model_id: 'sample-grok',
-    model_display_name: 'Grok 2 (xAI)',
-    model_external_id: 'grok-2-latest',
+    model_id: 'sample-llama',
+    model_display_name: 'Llama 3.1 8B Instruct (Cloudflare)',
+    model_external_id: '@cf/meta/llama-3.1-8b-instruct',
     total_tasks: 50,
     succeeded_tasks: 50,
     failed_tasks: 0,
@@ -188,7 +188,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
     <main>
       <div className="page-head">
         <div>
-          <h1>{comparison?.run_name || 'Grok 2 & Gemini vs Industry Baselines'}</h1>
+          <h1>{comparison?.run_name || 'Cloudflare & Gemini vs Industry Baselines'}</h1>
           <p className="muted">
             Run ID: <span className="mono">{selectedRunId || 'demo-baseline-run'}</span> · Baseline set v2026.09 · Normalized via Industry Comparison Engine
           </p>
