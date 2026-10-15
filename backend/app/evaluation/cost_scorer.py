@@ -36,8 +36,7 @@ PRICING_TABLE: dict[str, dict[str, float]] = {
     "openrouter::google/gemma-2-9b-it:free":              {"input_per_1m": 0.0, "output_per_1m": 0.0},
     # Cloudflare Workers AI
     "cloudflare::@cf/meta/llama-3.1-8b-instruct": {"input_per_1m": 0.0, "output_per_1m": 0.0},
-    # NVIDIA NIM (free credits)
-    "nvidia_nim::meta/llama-3.1-8b-instruct": {"input_per_1m": 0.0, "output_per_1m": 0.0},
+    "cloudflare::@cf/mistralai/mistral-7b-instruct-v0.2": {"input_per_1m": 0.0, "output_per_1m": 0.0},
 }
 
 # Fallback pricing for unknown models
