@@ -226,6 +226,12 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
         </div>
       )}
 
+      {runs.find((r) => r.id === selectedRunId)?.config_json?.stopped_early && (
+        <div className="callout" style={{ borderColor: 'var(--t-mid)', background: 'var(--t-mid-bg)', color: 'var(--t-mid)', marginBottom: 18 }}>
+          ℹ️ <b>Partial Evaluation:</b> This run was stopped early by user request. All displayed capability tiers, radar graphs, and positioning metrics are calculated strictly on the {model.succeeded_tasks} completed test tasks.
+        </div>
+      )}
+
       {/* Model Selector Tabs if multiple models in run */}
       {comparison && comparison.models.length > 1 && (
         <div style={{ marginBottom: 16 }}>
