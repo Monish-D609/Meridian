@@ -35,6 +35,9 @@ from app.models.models import (
 # Max concurrent adapter calls (respect free-tier rate limits)
 _MAX_CONCURRENT_CELLS = 3
 
+# Active cancellation registry for stopping runs gracefully
+_stop_requested_runs: set[str] = set()
+
 
 async def create_run(
     session: AsyncSession,
@@ -160,6 +163,19 @@ async def execute_run(
         # Execute cells concurrently with semaphore
         async def _execute_one(cell_id: str) -> tuple[str, str]:
             """Execute one cell in its own session. Returns (cell_id, status)."""
+            if run_id in _stop_requested_runs:
+                try:
+                    async with session_factory() as cell_session:
+                        cell = await cell_session.get(RunResult, cell_id)
+                        if cell and cell.status == "pending":
+                            async with _db_write_lock:
+                                cell.status = "skipped"
+                                cell.error_message = "Stopped by user."
+                                await cell_session.commit()
+                except Exception:
+                    pass
+                return cell_id, "skipped"
+
             async with semaphore:
                 try:
                     async with session_factory() as cell_session:
@@ -237,7 +253,9 @@ async def execute_run(
 
         # Tally results and update run
         succeeded = sum(1 for r in results if not isinstance(r, Exception) and r[1] == "succeeded")
-        failed = sum(1 for r in results if isinstance(r, Exception) or r[1] != "succeeded")
+        failed = sum(1 for r in results if isinstance(r, Exception) or r[1] not in ("succeeded", "skipped"))
+        is_stopped = run_id in _stop_requested_runs
+        _stop_requested_runs.discard(run_id)
 
         async with session_factory() as session:
             run = await session.get(BenchmarkRun, run_id)
@@ -245,6 +263,10 @@ async def execute_run(
             run.failed_cells = failed
             run.status = "completed"
             run.completed_at = datetime.now(timezone.utc)
+            if is_stopped:
+                cfg = dict(run.config_json or {})
+                cfg["stopped_early"] = True
+                run.config_json = cfg
             await session.commit()
 
         # Trigger Industry Comparison Engine
@@ -289,7 +311,8 @@ async def get_run_progress(run_id: str, session: AsyncSession) -> dict:
     total = sum(status_counts.values())
     succeeded_cells = status_counts.get("succeeded", 0)
     failed_cells = status_counts.get("failed", 0) + status_counts.get("quota_exceeded", 0)
-    done = succeeded_cells + failed_cells
+    skipped_cells = status_counts.get("skipped", 0)
+    done = succeeded_cells + failed_cells + skipped_cells
 
     # Also load brief cell objects so frontend progress tables can render live cells
     cell_query = await session.execute(
@@ -318,11 +341,67 @@ async def get_run_progress(run_id: str, session: AsyncSession) -> dict:
         "failed_cells": failed_cells,
         "succeeded": succeeded_cells,
         "failed": failed_cells,
+        "skipped": skipped_cells,
+        "stopped_early": bool(run.config_json and run.config_json.get("stopped_early")) if run else False,
         "pending": status_counts.get("pending", 0),
         "running": status_counts.get("running", 0),
         "progress_pct": round(done / total * 100, 1) if total > 0 else 0,
         "cells": cells,
     }
+
+
+async def stop_run(run_id: str, session_factory) -> BenchmarkRun:
+    """
+    Gracefully halt an in-progress benchmark run.
+    Marks remaining pending cells as 'skipped', updates run tallies,
+    sets status to 'completed', and runs the Industry Comparison Engine
+    strictly on the tests conducted so far.
+    """
+    from sqlalchemy import func, select
+
+    _stop_requested_runs.add(run_id)
+
+    async with session_factory() as session:
+        run = await session.get(BenchmarkRun, run_id)
+        if not run:
+            raise ValueError(f"Run {run_id} not found.")
+
+        # Skip all pending cells immediately
+        pending_result = await session.execute(
+            select(RunResult).where(RunResult.run_id == run_id, RunResult.status == "pending")
+        )
+        for cell in pending_result.scalars().all():
+            cell.status = "skipped"
+            cell.error_message = "Stopped by user."
+
+        # Count completed so far
+        succ_res = await session.execute(
+            select(func.count(RunResult.id)).where(RunResult.run_id == run_id, RunResult.status == "succeeded")
+        )
+        succeeded = succ_res.scalar() or 0
+
+        fail_res = await session.execute(
+            select(func.count(RunResult.id)).where(RunResult.run_id == run_id, RunResult.status.in_(("failed", "quota_exceeded")))
+        )
+        failed = fail_res.scalar() or 0
+
+        cfg = dict(run.config_json or {})
+        cfg["stopped_early"] = True
+        run.config_json = cfg
+        run.succeeded_cells = succeeded
+        run.failed_cells = failed
+        run.status = "completed"
+        run.completed_at = datetime.now(timezone.utc)
+        await session.commit()
+
+        # Trigger Industry Comparison Engine on tests conducted so far
+        try:
+            await _run_industry_comparison(run_id=run_id, session=session)
+        except Exception as comp_err:
+            print(f"[WARN] Comparison engine error on stop: {comp_err}")
+
+        await session.refresh(run)
+        return run
 
 
 async def _run_industry_comparison(run_id: str, session: AsyncSession) -> None:
@@ -403,6 +482,10 @@ async def _run_industry_comparison(run_id: str, session: AsyncSession) -> None:
             cat_slug = cat_id_to_slug.get(dataset.category_id, "") if dataset else ""
             if not cat_slug:
                 cat_slug = "reasoning"
+
+            if rr.status in ("skipped", "cancelled", "pending"):
+                # Omit unattempted tasks from scoring averages so results reflect only conducted tests
+                continue
 
             if rr.status != "succeeded":
                 cat_scores[cat_slug].append(0.0)
