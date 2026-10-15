@@ -83,6 +83,7 @@ app.add_middleware(
 # Routers
 # ---------------------------------------------------------------------------
 app.include_router(health.router,     prefix="",           tags=["Health"])
+app.include_router(health.router,     prefix="/api/v1",    tags=["Health"])
 app.include_router(providers.router,  prefix="/api/v1",    tags=["Providers & Models"])
 app.include_router(datasets.router,   prefix="/api/v1",    tags=["Datasets & Tasks"])
 app.include_router(runs.router,       prefix="/api/v1",    tags=["Benchmark Runs"])
