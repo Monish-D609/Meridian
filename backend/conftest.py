@@ -21,5 +21,5 @@ def clear_env_vars(monkeypatch):
     Individual tests that need keys use monkeypatch.setenv().
     """
     for var in ["GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY",
-                "CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "NVIDIA_API_KEY"]:
+                "CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]:
         monkeypatch.delenv(var, raising=False)

@@ -191,14 +191,10 @@ async def execute_run(
                             adapter_key = "cloudflare"
                         elif "gemini" in p_lower or "google" in p_lower:
                             adapter_key = "gemini"
-                        elif "grok" in p_lower or "xai" in p_lower:
-                            adapter_key = "xai"
                         elif "groq" in p_lower:
                             adapter_key = "groq"
                         elif "openrouter" in p_lower:
                             adapter_key = "openrouter"
-                        elif "nvidia" in p_lower or "nim" in p_lower:
-                            adapter_key = "nvidia_nim"
                         else:
                             adapter_key = p_lower.replace(" ", "_")
 
