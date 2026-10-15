@@ -40,6 +40,7 @@ export const NewRunPage: React.FC<NewRunPageProps> = ({ onRunStarted, onNavigate
   // Live active run tracking
   const [activeRun, setActiveRun] = useState<BenchmarkRun | null>(null);
   const [progress, setProgress] = useState<RunProgress | null>(null);
+  const [stopping, setStopping] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -205,6 +206,23 @@ export const NewRunPage: React.FC<NewRunPageProps> = ({ onRunStarted, onNavigate
       setError(err.message || 'Failed to launch benchmark run');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleStopRun = async () => {
+    if (!activeRun) return;
+    setStopping(true);
+    setError(null);
+    try {
+      await api.stopRun(activeRun.id);
+      const prog = await api.getRunProgress(activeRun.id);
+      setProgress(prog);
+      setActiveRun((prev) => (prev ? { ...prev, status: 'completed' } : null));
+      onNavigateToResults(activeRun.id);
+    } catch (err: any) {
+      setError(err.message || 'Failed to stop benchmark run');
+    } finally {
+      setStopping(false);
     }
   };
 
@@ -613,13 +631,19 @@ export const NewRunPage: React.FC<NewRunPageProps> = ({ onRunStarted, onNavigate
                     </div>
                   </div>
 
-                  {activeRun.status === 'completed' && (
+                  {activeRun.status === 'completed' && !(progress as any)?.stopped_early && (
                     <div className="callout" style={{ borderColor: 'var(--t-strong)', background: 'var(--t-strong-bg)', color: 'var(--t-strong)', marginBottom: 14 }}>
                       ✓ Benchmark complete! All candidate outputs and judge scores are compiled and ready.
                     </div>
                   )}
 
-                  <div className="btn-row">
+                  {(progress as any)?.stopped_early && (
+                    <div className="callout" style={{ borderColor: 'var(--t-mid)', background: 'var(--t-mid-bg)', color: 'var(--t-mid)', marginBottom: 14 }}>
+                      ⚠️ Run stopped early by user. Analytics and capability positioning are calculated strictly for conducted tests.
+                    </div>
+                  )}
+
+                  <div className="btn-row" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       className="btn primary"
@@ -627,7 +651,32 @@ export const NewRunPage: React.FC<NewRunPageProps> = ({ onRunStarted, onNavigate
                     >
                       View Live Results Dashboard →
                     </button>
+                    {(activeRun.status === 'running' || activeRun.status === 'pending') && (
+                      <button
+                        type="button"
+                        className="btn"
+                        disabled={stopping}
+                        onClick={handleStopRun}
+                        style={{
+                          borderColor: '#ef4444',
+                          color: '#ef4444',
+                          background: 'rgba(239, 68, 68, 0.08)',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                        }}
+                      >
+                        <span>🛑</span>
+                        {stopping ? 'Stopping & compiling results...' : 'Stop Remaining Tests'}
+                      </button>
+                    )}
                   </div>
+                  {(activeRun.status === 'running' || activeRun.status === 'pending') && (
+                    <span className="small muted" style={{ display: 'block', marginTop: 6 }}>
+                      Stops remaining pending tasks and immediately produces results for tests conducted so far.
+                    </span>
+                  )}
                 </>
               ) : (
                 <p className="small muted">Initializing work queue...</p>
