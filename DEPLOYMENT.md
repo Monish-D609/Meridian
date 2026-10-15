@@ -26,11 +26,10 @@ React Frontend (served separately — Railway static or Vercel)
 
 | Provider | URL | Notes |
 |---|---|---|
-| **xAI** (Grok — Elon Musk) | https://console.x.ai | API key for grok-2-latest & grok-2-mini |
-| **Groq** (fast LPU inference) | https://console.groq.com | Sign up → API Keys |
-| **Google AI Studio** (Gemini, LLM-judge) | https://aistudio.google.com/app/apikey | Free, no credit card |
-| **OpenRouter** (many free models) | https://openrouter.ai/keys | Create key, no payment needed for :free models |
-| **Cloudflare Workers AI** | https://dash.cloudflare.com | Get Account ID + API Token |
+| **Cloudflare Workers AI** | https://dash.cloudflare.com | Free allocation: Get Account ID + API Token |
+| **Groq** (fast LPU inference) | https://console.groq.com | Free fast LPU tier: Sign up → API Keys |
+| **Google AI Studio** (Gemini, LLM-judge) | https://aistudio.google.com/app/apikey | Free tier, no credit card: Gemini 1.5 Flash & Pro |
+| **OpenRouter** (free models) | https://openrouter.ai/keys | Create key, no payment needed for :free models |
 
 ---
 
@@ -58,13 +57,12 @@ Set these in Railway → Project → Variables:
 DATABASE_URL=postgresql+asyncpg://...neon.tech/meridian?sslmode=require
 DATABASE_URL_SYNC=postgresql+psycopg2://...neon.tech/meridian?sslmode=require
 
-# LLM Providers
-XAI_API_KEY=xai-...
+# LLM Providers (Cloudflare, Groq, Gemini, OpenRouter)
+CLOUDFLARE_ACCOUNT_ID=...
+CLOUDFLARE_API_TOKEN=...
 GROQ_API_KEY=gsk_...
 GEMINI_API_KEY=AIza...
 OPENROUTER_API_KEY=sk-or-...
-CLOUDFLARE_ACCOUNT_ID=...
-CLOUDFLARE_API_TOKEN=...
 
 # Judge configuration (reproducibility — stored in every run)
 JUDGE_PROVIDER=gemini
