@@ -29,16 +29,13 @@ class Settings(BaseSettings):
     DATABASE_URL_SYNC: str = "postgresql+psycopg2://meridian:meridian@localhost:5432/meridian"
 
     # -------------------------------------------------------------------------
-    # LLM Provider API Keys
+    # LLM Provider API Keys (Cloudflare, Groq, Gemini, OpenRouter)
     # -------------------------------------------------------------------------
     GROQ_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     OPENROUTER_API_KEY: str = ""
     CLOUDFLARE_ACCOUNT_ID: str = ""
     CLOUDFLARE_API_TOKEN: str = ""
-    NVIDIA_API_KEY: str = ""
-    XAI_API_KEY: str = ""
-    GROK_API_KEY: str = ""
 
     # -------------------------------------------------------------------------
     # LLM-as-a-Judge — stored per BenchmarkRun for reproducibility (SRS FR-3.5)
