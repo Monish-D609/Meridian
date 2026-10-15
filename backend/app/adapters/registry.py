@@ -13,23 +13,18 @@ from app.adapters.base import BaseAdapter
 from app.adapters.cloudflare_adapter import CloudflareAdapter
 from app.adapters.gemini_adapter import GeminiAdapter
 from app.adapters.groq_adapter import GroqAdapter
-from app.adapters.nim_adapter import NIMAdapter
 from app.adapters.openrouter_adapter import OpenRouterAdapter
-from app.adapters.xai_adapter import XAIAdapter
 
 # ---------------------------------------------------------------------------
 # Registry: provider_name → adapter class
+# Supported providers: Cloudflare, Groq, Gemini, OpenRouter
 # ---------------------------------------------------------------------------
 _ADAPTER_CLASSES: dict[str, type[BaseAdapter]] = {
+    "cloudflare": CloudflareAdapter,
     "groq": GroqAdapter,
     "gemini": GeminiAdapter,
     "google": GeminiAdapter,          # alias
     "openrouter": OpenRouterAdapter,
-    "cloudflare": CloudflareAdapter,
-    "nvidia_nim": NIMAdapter,
-    "nim": NIMAdapter,               # alias
-    "xai": XAIAdapter,
-    "grok": XAIAdapter,              # alias
 }
 
 # Singletons (one instance per provider, created on first access)
