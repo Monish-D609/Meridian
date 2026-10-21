@@ -8,10 +8,12 @@ foreach ($port in $ports) {
             $pidToKill = $conn.OwningProcess
             try {
                 Stop-Process -Id $pidToKill -Force -ErrorAction SilentlyContinue
-                Write-Host "  [✓] Stopped process PID $pidToKill on port $port" -ForegroundColor Green
-            } catch {}
+                Write-Host "  [OK] Stopped process PID $pidToKill on port $port" -ForegroundColor Green
+            } catch {
+                # Ignore process termination errors
+            }
         }
     }
 }
 
-Write-Host "[✓] All Meridian services stopped." -ForegroundColor Green
+Write-Host "[OK] All Meridian services stopped." -ForegroundColor Green
