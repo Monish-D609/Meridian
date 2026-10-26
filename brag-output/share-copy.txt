@@ -1,0 +1,3 @@
+Introducing Meridian: an enterprise-grade, reproducible LLM benchmarking and positioning platform.
+
+While traditional leaderboards collapse models into a single misleading average, Meridian provides 7-axis capability radar profiling and atomic sentence-level hallucination detection — engineered to run on a 100% zero-cost free-tier stack.

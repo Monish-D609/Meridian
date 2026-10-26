@@ -549,18 +549,6 @@ Meridian rejects single-aggregate leaderboard rankings in favor of per-category 
 
 ---
 
-## 👥 Authors & Academic Context
-
-Meridian was designed and developed as an academic software engineering capstone project:
-
-- **Monish D** — `24BDS1033`
-- **Soaham S** — `24BDS1021`
-
-**Course**: Software Engineering — Digital Assignment  
-**Specification Documents**:
-- Product Requirements Document: [`PRD.md`](file:///c:/Users/Monish%20D/Documents/Meridian/PRD.md)
-- Software Requirements Specification: [`SRS.md`](file:///c:/Users/Monish%20D/Documents/Meridian/SRS.md)
-
 ---
 
 <div align="center">

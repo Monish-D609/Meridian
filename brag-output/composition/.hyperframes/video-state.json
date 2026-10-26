@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "historyId": "773dc788-7ff6-4071-a24c-b8b994e80cf8",
+  "currentRevision": "54a9b072-5aec-4598-9cf4-afc474f922d8",
+  "pendingChanges": false,
+  "files": {
+    "assets/sfx/alert.ogg": {
+      "hash": "3f75b11df5b06d68d2c25fbf0e9c9d9e7dd9250562a4007ee34856b8a309a2ae",
+      "content": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\3f\\3f75b11df5b06d68d2c25fbf0e9c9d9e7dd9250562a4007ee34856b8a309a2ae"
+    },
+    "assets/sfx/click.ogg": {
+      "hash": "59175ac17cd49a68dd736285738441287636112a84a6f7ce0d89921bda5a5360",
+      "content": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\59\\59175ac17cd49a68dd736285738441287636112a84a6f7ce0d89921bda5a5360"
+    },
+    "assets/sfx/select.ogg": {
+      "hash": "f703b6b1c62dae1c246a46d5c2442802588f68be2df4d17e0d65cf7e0dbfc826",
+      "content": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\f7\\f703b6b1c62dae1c246a46d5c2442802588f68be2df4d17e0d65cf7e0dbfc826"
+    },
+    "hyperframes.json": {
+      "hash": "53dbce1e19aa713cbb12ee0bc4d206143b45ab15e6ffbfcaa8f69572d4d24d50",
+      "content": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\53\\53dbce1e19aa713cbb12ee0bc4d206143b45ab15e6ffbfcaa8f69572d4d24d50"
+    },
+    "index.html": {
+      "hash": "89a0f5064c90254dfeb4999abab3909ef777a746c882614a027d05abb3702f22",
+      "content": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\89\\89a0f5064c90254dfeb4999abab3909ef777a746c882614a027d05abb3702f22"
+    },
+    "meta.json": {
+      "hash": "c6511a015fd554fccddf7f2ac09c9bee8e20818a653765ae4b193a81de49347c",
+      "content": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\c6\\c6511a015fd554fccddf7f2ac09c9bee8e20818a653765ae4b193a81de49347c"
+    },
+    "package.json": {
+      "hash": "8d0e458c451736916647cd5cd35be258fb526564200acbbbc06243364dbe9bdf",
+      "content": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\8d\\8d0e458c451736916647cd5cd35be258fb526564200acbbbc06243364dbe9bdf"
+    },
+    "assets/music/bg-music.mp3": {
+      "hash": "364a546834db4c0c2e3b3240eb6df03e98b7362230154b04c5c614442f6660d7",
+      "content": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\36\\364a546834db4c0c2e3b3240eb6df03e98b7362230154b04c5c614442f6660d7"
+    }
+  },
+  "revisions": {
+    "70ff0eff-8140-4c7b-8990-2dcd00cb1289": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792932602999,
+      "endedAt": 1792932603001,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\8c\\8cc159cfb8f4cf5fd34d6a6faee7b720c875b00168dbc6f5c663824b44907410",
+          "after": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\1b\\1b84c3aafe9806fae1f4e1b19b9e91ef551c964ca064dee00319c3b04dba29d2"
+        }
+      }
+    },
+    "54a9b072-5aec-4598-9cf4-afc474f922d8": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792932759287,
+      "endedAt": 1792932759290,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\1b\\1b84c3aafe9806fae1f4e1b19b9e91ef551c964ca064dee00319c3b04dba29d2",
+          "after": "C:\\Users\\Monish D\\.cache\\hyperframes\\history\\773dc788-7ff6-4071-a24c-b8b994e80cf8\\blobs\\89\\89a0f5064c90254dfeb4999abab3909ef777a746c882614a027d05abb3702f22"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": {
+      "revision": null,
+      "id": "b2f7a734-4bf0-4063-a26b-770236131aff"
+    },
+    "revisions": {
+      "70ff0eff-8140-4c7b-8990-2dcd00cb1289": [
+        {
+          "id": "3272f999-b934-4280-8025-6e7e7b714efb",
+          "scope": "project",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1792932635085,
+          "contentHash": "1a1351fa3666dc156321a2544a14a1c1bae3d353583a8aa94c64f046c0a5d584",
+          "revision": "70ff0eff-8140-4c7b-8990-2dcd00cb1289",
+          "inputFingerprint": "fe4237bd01c239f2de5df8b8d890b5514b512bbbfc9569d02780fd6dba05ae6d",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "af8d62bf-98fc-4e68-8901-d1b38da0bd83"
+        }
+      ]
+    },
+    "unversioned": [
+      {
+        "id": "b2f7a734-4bf0-4063-a26b-770236131aff",
+        "scope": "project",
+        "report": "C:\\Users\\Monish D\\Documents\\Meridian\\brag-output\\composition\\.hyperframes\\artifacts\\checks\\b2f7a734-4bf0-4063-a26b-770236131aff.json",
+        "metadata": {
+          "ok": false,
+          "browserSkipped": true,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 3000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto"
+          }
+        },
+        "createdAt": 1792932481183,
+        "contentHash": "0a77bcaa68d1bed7bd27699810cded69cfecb2de003acd8349ab8ca2454cb676",
+        "revision": null,
+        "inputFingerprint": "865071a65b9a3a39e3b5bf5892e36070cc87a6b5e5eacd4b57991e63cb5d4a1e",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "af8d62bf-98fc-4e68-8901-d1b38da0bd83",
+      "completedAt": 1792932853398,
+      "output": "C:\\Users\\Monish D\\Documents\\Meridian\\brag-output\\brag.mp4",
+      "status": "completed",
+      "revision": "54a9b072-5aec-4598-9cf4-afc474f922d8"
+    },
+    "retainedRevisions": [
+      "54a9b072-5aec-4598-9cf4-afc474f922d8"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}

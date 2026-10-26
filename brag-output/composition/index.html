@@ -1,0 +1,1230 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Meridian Launch Video</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap"
+      rel="stylesheet"
+    />
+    <!-- GSAP Runtime -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #10151b;
+        --panel: #18202a;
+        --panel-head: #141b24;
+        --ink: #e8ecf0;
+        --ink-2: #aab4bf;
+        --ink-3: #7c8997;
+        --line: #2b3642;
+        --line-bright: #3c4b5c;
+        --accent: #6b93f5;
+        --accent-soft: #1d2a47;
+        --accent-glow: rgba(107, 147, 245, 0.35);
+
+        --t-frontier: #b3a9ff;
+        --t-frontier-bg: #2a2652;
+        --t-strong: #5ed0ce;
+        --t-strong-bg: #12363a;
+        --t-mid: #e8b659;
+        --t-mid-bg: #40331a;
+        --t-weak: #f08a82;
+        --t-weak-bg: #432220;
+
+        --verified: #4ade80;
+        --verified-bg: #133820;
+
+        --sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+        --serif: "Source Serif 4", Georgia, serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        background: radial-gradient(circle at 50% 15%, #182230 0%, #10151b 75%);
+        overflow: hidden;
+      }
+
+      /* Grid texture overlay */
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-size: 40px 40px;
+        background-image:
+          linear-gradient(to right, rgba(43, 54, 66, 0.3) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(43, 54, 66, 0.3) 1px, transparent 1px);
+        mask-image: radial-gradient(circle at 50% 50%, black 50%, transparent 95%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Glow orb */
+      .ambient-glow {
+        position: absolute;
+        width: 800px;
+        height: 800px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(107, 147, 245, 0.15) 0%, transparent 70%);
+        top: -150px;
+        left: 560px;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* Global Stage Frame */
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 60px 100px;
+        z-index: 10;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      /* Top Stage Pill */
+      .stage-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 18px;
+        border-radius: 9999px;
+        background: rgba(29, 42, 71, 0.7);
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+      }
+
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
+      }
+
+      /* Application Mockup Frame */
+      .app-window {
+        width: 1720px;
+        height: 940px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .window-header {
+        height: 56px;
+        background: var(--panel-head);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+      }
+
+      .window-dots {
+        display: flex;
+        gap: 8px;
+      }
+
+      .window-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .dot-red { background: #ef4444; }
+      .dot-yellow { background: #eab308; }
+      .dot-green { background: #22c55e; }
+
+      .window-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--ink-2);
+      }
+
+      .window-breadcrumb span.active {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .window-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 6px;
+        background: rgba(34, 197, 94, 0.12);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .window-body {
+        flex: 1;
+        padding: 36px 44px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      /* Scene 1: The Problem */
+      #scene-1 .hook-headline {
+        font-family: var(--serif);
+        font-size: 64px;
+        line-height: 1.15;
+        font-weight: 700;
+        text-align: center;
+        max-width: 1300px;
+        color: #ffffff;
+        margin-bottom: 40px;
+      }
+
+      .split-compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        width: 1400px;
+      }
+
+      .compare-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 36px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .compare-card.bad {
+        border-color: rgba(240, 138, 130, 0.4);
+        background: linear-gradient(180deg, rgba(67, 34, 32, 0.25) 0%, var(--panel) 100%);
+      }
+
+      .compare-card.good {
+        border-color: rgba(107, 147, 245, 0.5);
+        background: linear-gradient(180deg, rgba(29, 42, 71, 0.35) 0%, var(--panel) 100%);
+        box-shadow: 0 0 35px rgba(107, 147, 245, 0.12);
+      }
+
+      .card-tag {
+        font-family: var(--mono);
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      .card-tag.bad { color: var(--t-weak); }
+      .card-tag.good { color: var(--accent); }
+
+      .metric-hero {
+        font-family: var(--serif);
+        font-size: 58px;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .strikethrough-score {
+        position: relative;
+        display: inline-block;
+        color: #94a3b8;
+      }
+
+      .strike-line {
+        position: absolute;
+        top: 50%;
+        left: -5%;
+        width: 110%;
+        height: 4px;
+        background: #ef4444;
+        transform: rotate(-6deg);
+        box-shadow: 0 0 10px #ef4444;
+      }
+
+      .card-desc {
+        font-size: 18px;
+        color: var(--ink-2);
+        line-height: 1.5;
+      }
+
+      /* Scene 2: Benchmark Matrix */
+      .provider-ribbon {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .provider-chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px;
+        background: #141b24;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--ink);
+      }
+
+      .provider-chip.active {
+        border-color: var(--accent);
+        background: rgba(107, 147, 245, 0.12);
+        box-shadow: 0 0 15px rgba(107, 147, 245, 0.15);
+      }
+
+      .matrix-table {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+        background: #121820;
+      }
+
+      .matrix-row {
+        display: grid;
+        grid-template-columns: 240px 1fr 140px 140px 140px;
+        align-items: center;
+        padding: 14px 24px;
+        border-bottom: 1px solid var(--line);
+        font-size: 15px;
+      }
+
+      .matrix-row.head {
+        background: #17202c;
+        font-family: var(--mono);
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        letter-spacing: 0.05em;
+      }
+
+      .matrix-row:last-child {
+        border-bottom: none;
+      }
+
+      .task-cat {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      .task-title {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--ink-2);
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .status-pill.pass {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+      }
+
+      .telemetry-bar {
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #141b24;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px 24px;
+        font-family: var(--mono);
+        font-size: 14px;
+      }
+
+      .telemetry-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .telemetry-val {
+        color: #ffffff;
+        font-weight: 700;
+      }
+
+      /* Scene 3: Radar Chart & Tiers */
+      .radar-layout {
+        display: grid;
+        grid-template-columns: 960px 1fr;
+        gap: 40px;
+        height: 100%;
+        align-items: center;
+      }
+
+      .radar-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      svg.radar-svg {
+        width: 820px;
+        height: 680px;
+        overflow: visible;
+      }
+
+      .radar-ring {
+        fill: none;
+        stroke: #2b3642;
+        stroke-width: 1.5;
+      }
+
+      .radar-spoke {
+        stroke: #2b3642;
+        stroke-width: 1.5;
+        stroke-dasharray: 4 4;
+      }
+
+      .radar-baseline {
+        fill: rgba(148, 163, 184, 0.08);
+        stroke: #94a3b8;
+        stroke-width: 2;
+        stroke-dasharray: 6 6;
+      }
+
+      .radar-candidate {
+        fill: rgba(107, 147, 245, 0.28);
+        stroke: var(--accent);
+        stroke-width: 3.5;
+        filter: drop-shadow(0 0 16px rgba(107, 147, 245, 0.6));
+      }
+
+      .radar-label {
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 600;
+        fill: var(--ink);
+      }
+
+      .radar-val {
+        font-family: var(--mono);
+        font-size: 12px;
+        fill: var(--accent);
+        font-weight: 700;
+      }
+
+      .tier-column {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .tier-card {
+        background: #141b24;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .tier-card.frontier {
+        border-color: rgba(179, 169, 255, 0.5);
+        background: linear-gradient(90deg, rgba(42, 38, 82, 0.4) 0%, #141b24 100%);
+      }
+
+      .tier-card.strong {
+        border-color: rgba(94, 208, 206, 0.5);
+        background: linear-gradient(90deg, rgba(18, 54, 58, 0.4) 0%, #141b24 100%);
+      }
+
+      .tier-badge {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .badge-frontier { background: var(--t-frontier-bg); color: var(--t-frontier); }
+      .badge-strong { background: var(--t-strong-bg); color: var(--t-strong); }
+      .badge-mid { background: var(--t-mid-bg); color: var(--t-mid); }
+
+      .tier-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .tier-sub {
+        font-size: 14px;
+        color: var(--ink-2);
+        line-height: 1.4;
+      }
+
+      /* Scene 4: Hallucination Audit */
+      .audit-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .audit-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .metric-pill-row {
+        display: flex;
+        gap: 16px;
+      }
+
+      .metric-tag {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        background: #141b24;
+        border: 1px solid var(--line);
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .metric-tag b { color: #ffffff; }
+
+      .response-audit-box {
+        background: #131922;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .prompt-line {
+        font-size: 15px;
+        color: var(--ink-3);
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 12px;
+      }
+
+      .prompt-line b { color: var(--ink-2); }
+
+      .response-text {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #f1f5f9;
+      }
+
+      .claim-verified {
+        background: rgba(74, 222, 128, 0.12);
+        border-bottom: 2px solid #4ade80;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+
+      .claim-fabricated {
+        background: rgba(239, 68, 68, 0.2);
+        border-bottom: 3px solid #ef4444;
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: #ffffff;
+        font-weight: 600;
+        position: relative;
+      }
+
+      .discrepancy-card {
+        background: #1e1315;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        border-radius: 10px;
+        padding: 20px 24px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .alert-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      .discrepancy-content {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .discrepancy-title {
+        font-family: var(--mono);
+        font-size: 14px;
+        font-weight: 700;
+        color: #f87171;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .discrepancy-desc {
+        font-size: 15px;
+        color: #e2e8f0;
+        line-height: 1.45;
+      }
+
+      /* Scene 5: Outro */
+      #scene-5 {
+        text-align: center;
+      }
+
+      .brand-lockup {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .brand-logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #1d4ed8 0%, #6b93f5 100%);
+        box-shadow: 0 0 40px rgba(107, 147, 245, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .brand-title {
+        font-family: var(--serif);
+        font-size: 84px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #ffffff;
+      }
+
+      .brand-tagline {
+        font-size: 24px;
+        color: var(--ink-2);
+        max-width: 850px;
+        line-height: 1.4;
+      }
+
+      .badge-cluster {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+      }
+
+      .cluster-item {
+        padding: 8px 18px;
+        background: rgba(29, 42, 71, 0.5);
+        border: 1px solid rgba(107, 147, 245, 0.3);
+        border-radius: 9999px;
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .cli-box {
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 28px;
+        background: #141b24;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        font-family: var(--mono);
+        font-size: 16px;
+        color: #4ade80;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .cli-prompt {
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="18"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Audio Elements inside composition root -->
+      <audio
+        id="bg-music"
+        data-start="0"
+        data-duration="18"
+        data-track-index="0"
+        data-volume="1"
+        src="assets/music/bg-music.mp3"
+      ></audio>
+      <audio
+        id="sfx-click"
+        data-start="4.23"
+        data-duration="0.09"
+        data-track-index="1"
+        data-volume="0.4"
+        src="assets/sfx/click.ogg"
+      ></audio>
+      <audio
+        id="sfx-select"
+        data-start="8.96"
+        data-duration="0.05"
+        data-track-index="1"
+        data-volume="0.6"
+        src="assets/sfx/select.ogg"
+      ></audio>
+      <audio
+        id="sfx-alert"
+        data-start="12.65"
+        data-duration="0.50"
+        data-track-index="1"
+        data-volume="0.6"
+        src="assets/sfx/alert.ogg"
+      ></audio>
+
+      <div class="bg-grid"></div>
+      <div class="ambient-glow" id="ambient-glow"></div>
+
+      <!-- ================= SCENE 1: THE PROBLEM (0.0s - 3.7s) ================= -->
+      <div class="stage" id="scene-1">
+        <div class="stage-pill" data-layout-ignore="true">
+          <div class="pulse-dot"></div>
+          EVALUATION REALITY CHECK
+        </div>
+        <h1 class="hook-headline">
+          Single-score leaderboards flatten LLMs.<br />
+          Meridian maps their exact coordinates.
+        </h1>
+        <div class="split-compare">
+          <!-- Flawed Leaderboard Card -->
+          <div class="compare-card bad" id="compare-bad">
+            <div class="card-tag bad" data-layout-ignore="true">Typical Benchmark Ranking</div>
+            <div class="metric-hero">
+              <span class="strikethrough-score">
+                Overall: 74.2%
+                <div class="strike-line"></div>
+              </span>
+            </div>
+            <div class="card-desc">
+              Averages coding, math, and factual QA into one flat number. Hides critical task-specific
+              failures and model collapse under pressure.
+            </div>
+          </div>
+          <!-- Meridian Solution Card -->
+          <div class="compare-card good" id="compare-good">
+            <div class="card-tag good" data-layout-ignore="true">Meridian Positioning Architecture</div>
+            <div class="metric-hero" style="font-size: 42px; line-height: 1.25">
+              7 Capability Axes + Claim Audit
+            </div>
+            <div class="card-desc">
+              Normalized against frontier baselines (GPT-4o, Claude 3.5 Sonnet) with atomic
+              hallucination isolation on a 100% free-tier stack.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SCENE 2: ZERO-COST MATRIX (3.7s - 7.8s) ================= -->
+      <div class="stage" id="scene-2">
+        <div class="app-window">
+          <div class="window-header">
+            <div class="window-dots">
+              <div class="window-dot dot-red"></div>
+              <div class="window-dot dot-yellow"></div>
+              <div class="window-dot dot-green"></div>
+            </div>
+            <div class="window-breadcrumb" data-layout-ignore="true">
+              <span>Meridian</span> / <span>Benchmarks</span> /
+              <span class="active">Run #042 · Multi-Model Ingest</span>
+            </div>
+            <div class="window-status" data-layout-ignore="true">
+              <div class="pulse-dot" style="background: #22c55e"></div>
+              100% ZERO-COST INFERENCE
+            </div>
+          </div>
+          <div class="window-body">
+            <div class="provider-ribbon">
+              <div class="provider-chip active" id="chip-1" data-layout-ignore="true">
+                <span>⚡</span> Cloudflare Workers AI · Llama 3.1 8B
+              </div>
+              <div class="provider-chip active" id="chip-2" data-layout-ignore="true">
+                <span>🚀</span> Groq LPU (300+ tok/s) · Qwen 2.5 32B
+              </div>
+              <div class="provider-chip active" id="chip-3" data-layout-ignore="true">
+                <span>💎</span> Google AI Studio · Gemini 1.5 Flash
+              </div>
+            </div>
+            <div class="matrix-table">
+              <div class="matrix-row head" data-layout-ignore="true">
+                <div>Capability Axis</div>
+                <div>Evaluation Task Sample</div>
+                <div>Status</div>
+                <div>Latency</div>
+                <div>Cost</div>
+              </div>
+              <div class="matrix-row" id="row-1">
+                <div class="task-cat" data-layout-ignore="true"><span style="color: #6b93f5">●</span> Coding</div>
+                <div class="task-title" data-layout-ignore="true">AST transformation & convex hull geometry</div>
+                <div><span class="status-pill pass" data-layout-ignore="true">✓ 10/10 PASS</span></div>
+                <div style="font-family: var(--mono)" data-layout-ignore="true">142 ms</div>
+                <div style="font-family: var(--mono); color: #4ade80" data-layout-ignore="true">$0.000</div>
+              </div>
+              <div class="matrix-row" id="row-2">
+                <div class="task-cat" data-layout-ignore="true"><span style="color: #b3a9ff">●</span> Mathematics</div>
+                <div class="task-title" data-layout-ignore="true">Multi-variable Bayesian posterior derivation</div>
+                <div><span class="status-pill pass" data-layout-ignore="true">✓ 12/12 PASS</span></div>
+                <div style="font-family: var(--mono)" data-layout-ignore="true">210 ms</div>
+                <div style="font-family: var(--mono); color: #4ade80" data-layout-ignore="true">$0.000</div>
+              </div>
+              <div class="matrix-row" id="row-3">
+                <div class="task-cat" data-layout-ignore="true"><span style="color: #5ed0ce">●</span> Reasoning</div>
+                <div class="task-title" data-layout-ignore="true">Temporal multi-hop constraint satisfaction</div>
+                <div><span class="status-pill pass" data-layout-ignore="true">✓ 15/15 PASS</span></div>
+                <div style="font-family: var(--mono)" data-layout-ignore="true">185 ms</div>
+                <div style="font-family: var(--mono); color: #4ade80" data-layout-ignore="true">$0.000</div>
+              </div>
+              <div class="matrix-row" id="row-4">
+                <div class="task-cat" data-layout-ignore="true"><span style="color: #e8b659">●</span> Factual QA</div>
+                <div class="task-title" data-layout-ignore="true">Coastal erosion survey grounded extraction</div>
+                <div><span class="status-pill pass" data-layout-ignore="true">✓ 13/13 PASS</span></div>
+                <div style="font-family: var(--mono)" data-layout-ignore="true">156 ms</div>
+                <div style="font-family: var(--mono); color: #4ade80" data-layout-ignore="true">$0.000</div>
+              </div>
+            </div>
+            <div class="telemetry-bar" data-layout-ignore="true">
+              <div class="telemetry-item">
+                <span>Active Tasks:</span>
+                <span class="telemetry-val">50 / 50 Complete</span>
+              </div>
+              <div class="telemetry-item">
+                <span>Inference Throughput:</span>
+                <span class="telemetry-val">284 tokens/s</span>
+              </div>
+              <div class="telemetry-item">
+                <span>Total Infrastructure Cost:</span>
+                <span class="telemetry-val" style="color: #4ade80">$0.00 (Zero-Cost Free Tier)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SCENE 3: 7-AXIS RADAR & TIERING (7.8s - 12.6s) ================= -->
+      <div class="stage" id="scene-3">
+        <div class="app-window">
+          <div class="window-header">
+            <div class="window-dots">
+              <div class="window-dot dot-red"></div>
+              <div class="window-dot dot-yellow"></div>
+              <div class="window-dot dot-green"></div>
+            </div>
+            <div class="window-breadcrumb" data-layout-ignore="true">
+              <span>Meridian</span> / <span>Comparative Analytics</span> /
+              <span class="active">7-Axis Capability Profile & Industry Tiers</span>
+            </div>
+            <div class="window-status" data-layout-ignore="true" style="border-color: rgba(179, 169, 255, 0.4); color: #b3a9ff; background: rgba(42, 38, 82, 0.5)">
+              FRONTIER NORMALIZED
+            </div>
+          </div>
+          <div class="window-body">
+            <div class="radar-layout">
+              <!-- SVG Radar Chart Container -->
+              <div class="radar-container">
+                <svg class="radar-svg" viewBox="0 0 820 680">
+                  <defs>
+                    <filter id="radar-glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="8" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+                  <!-- Concentric Rings (Center cx=410, cy=340, Max R=220) -->
+                  <!-- 25% Ring -->
+                  <polygon
+                    class="radar-ring"
+                    points="410.0,285.0 452.9,305.7 464.0,352.0 434.5,390.6 385.5,390.6 356.0,352.0 367.1,305.7"
+                  />
+                  <!-- 50% Ring -->
+                  <polygon
+                    class="radar-ring"
+                    points="410.0,230.0 495.8,271.3 518.0,364.0 458.9,441.2 361.1,441.2 302.0,364.0 324.2,271.3"
+                  />
+                  <!-- 75% Ring -->
+                  <polygon
+                    class="radar-ring"
+                    points="410.0,175.0 538.8,237.0 572.0,376.0 483.4,491.7 336.6,491.7 248.0,376.0 281.2,237.0"
+                  />
+                  <!-- 100% Outer Ring -->
+                  <polygon
+                    class="radar-ring"
+                    style="stroke: #3c4b5c; stroke-width: 2"
+                    points="410.0,120.0 581.7,202.7 626.0,388.0 507.9,542.3 312.1,542.3 194.0,388.0 238.3,202.7"
+                  />
+                  <!-- Spokes -->
+                  <g class="radar-spoke">
+                    <line x1="410" y1="340" x2="410.0" y2="120.0" />
+                    <line x1="410" y1="340" x2="581.7" y2="202.7" />
+                    <line x1="410" y1="340" x2="626.0" y2="388.0" />
+                    <line x1="410" y1="340" x2="507.9" y2="542.3" />
+                    <line x1="410" y1="340" x2="312.1" y2="542.3" />
+                    <line x1="410" y1="340" x2="194.0" y2="388.0" />
+                    <line x1="410" y1="340" x2="238.3" y2="202.7" />
+                  </g>
+                  <!-- Baseline Polygon (Dashed, ~0.76 median) -->
+                  <polygon
+                    class="radar-baseline"
+                    points="410.0,164.0 541.2,235.3 574.6,376.5 484.4,494.1 335.6,494.1 245.4,376.5 278.8,235.3"
+                  />
+                  <!-- Candidate Polygon (Glowing Accent) -->
+                  <polygon
+                    id="cand-polygon"
+                    class="radar-candidate"
+                    points="410.0,137.6 557.7,222.0 593.6,380.8 488.3,501.8 333.7,497.8 276.3,369.8 310.4,260.4"
+                  />
+
+                  <!-- Axis Labels -->
+                  <!-- 1. Mathematics (Top) -->
+                  <text class="radar-label" x="410" y="95" text-anchor="middle" data-layout-ignore="true">Mathematics</text>
+                  <text class="radar-val" x="410" y="112" text-anchor="middle" data-layout-ignore="true">92% [Frontier]</text>
+
+                  <!-- 2. Coding (Top Right) -->
+                  <text class="radar-label" x="600" y="195" text-anchor="start" data-layout-ignore="true">Coding</text>
+                  <text class="radar-val" x="600" y="212" text-anchor="start" data-layout-ignore="true">86% [Strong]</text>
+
+                  <!-- 3. Reasoning (Bottom Right) -->
+                  <text class="radar-label" x="645" y="390" text-anchor="start" data-layout-ignore="true">Reasoning</text>
+                  <text class="radar-val" x="645" y="407" text-anchor="start" data-layout-ignore="true">85% [Strong]</text>
+
+                  <!-- 4. Factual QA (Bottom) -->
+                  <text class="radar-label" x="520" y="570" text-anchor="middle" data-layout-ignore="true">Factual QA</text>
+                  <text class="radar-val" x="520" y="587" text-anchor="middle" data-layout-ignore="true">80%</text>
+
+                  <!-- 5. Summarization (Bottom Left) -->
+                  <text class="radar-label" x="300" y="570" text-anchor="middle" data-layout-ignore="true">Summarization</text>
+                  <text class="radar-val" x="300" y="587" text-anchor="middle" data-layout-ignore="true">78%</text>
+
+                  <!-- 6. Creative Writing (Left) -->
+                  <text class="radar-label" x="175" y="390" text-anchor="end" data-layout-ignore="true">Creative Writing</text>
+                  <text class="radar-val" x="175" y="407" text-anchor="end" data-layout-ignore="true">62% [Mid]</text>
+
+                  <!-- 7. Long-Context (Top Left) -->
+                  <text class="radar-label" x="220" y="195" text-anchor="end" data-layout-ignore="true">Long-Context</text>
+                  <text class="radar-val" x="220" y="212" text-anchor="end" data-layout-ignore="true">58%</text>
+                </svg>
+              </div>
+
+              <!-- Right Tier Breakdown Column -->
+              <div class="tier-column">
+                <div class="tier-card frontier" id="tier-1">
+                  <div class="tier-badge badge-frontier" data-layout-ignore="true">👑 Frontier Tier (≥ 85th %ile)</div>
+                  <div class="tier-title">Mathematics · 92nd Percentile</div>
+                  <div class="tier-sub" data-layout-ignore="true">
+                    Challenges GPT-4o and Gemini 1.5 Pro on complex multi-step symbolic derivation.
+                  </div>
+                </div>
+                <div class="tier-card strong" id="tier-2">
+                  <div class="tier-badge badge-strong" data-layout-ignore="true">🚀 Strong Tier (65th–84th %ile)</div>
+                  <div class="tier-title">Coding & Reasoning · 86th Percentile</div>
+                  <div class="tier-sub" data-layout-ignore="true">
+                    Highly capable for autonomous code generation and multi-hop logical deductions.
+                  </div>
+                </div>
+                <div class="tier-card" id="tier-3">
+                  <div class="tier-badge badge-mid" data-layout-ignore="true">⚖️ Mid Tier (40th–64th %ile)</div>
+                  <div class="tier-title">Long-Context & Creative · 58th Percentile</div>
+                  <div class="tier-sub" data-layout-ignore="true">
+                    Solid for standard tasks; guardrails recommended on 32k+ token context windows.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SCENE 4: CLAIM HALLUCINATION AUDIT (12.6s - 15.8s) ================= -->
+      <div class="stage" id="scene-4">
+        <div class="app-window">
+          <div class="window-header">
+            <div class="window-dots">
+              <div class="window-dot dot-red"></div>
+              <div class="window-dot dot-yellow"></div>
+              <div class="window-dot dot-green"></div>
+            </div>
+            <div class="window-breadcrumb" data-layout-ignore="true">
+              <span>Meridian</span> / <span>Responses & Audit</span> /
+              <span class="active">Atomic Claim Groundedness Verification</span>
+            </div>
+            <div class="window-status" data-layout-ignore="true" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171; background: rgba(67, 34, 32, 0.5)">
+              DISCREPANCY ISOLATED
+            </div>
+          </div>
+          <div class="window-body">
+            <div class="audit-layout">
+              <div class="audit-header-row">
+                <div style="font-size: 20px; font-weight: 700; color: #ffffff">
+                  Sentence-Level Hallucination Scorer
+                </div>
+                <div class="metric-pill-row" data-layout-ignore="true">
+                  <div class="metric-tag">Groundedness: <b>58.2%</b></div>
+                  <div class="metric-tag">Hallucination Rate: <b style="color: #f87171">8.2%</b></div>
+                  <div class="metric-tag">Extracted Claims: <b>14 Assertions</b></div>
+                </div>
+              </div>
+              <div class="response-audit-box">
+                <div class="prompt-line" data-layout-ignore="true">
+                  <b>Prompt Query:</b> "Using only the provided geological survey, summarize the 2019 coastal setback findings."
+                </div>
+                <div class="response-text" data-layout-ignore="true">
+                  <span class="claim-verified">
+                    "The 2019 survey found that erosion rates doubled along the northern shoreline, driven primarily by storm frequency."
+                  </span>
+                  <span class="claim-fabricated" id="claim-highlight">
+                    "The authors recommend a 40-metre setback for new buildings, though municipal guidelines require 25 metres."
+                  </span>
+                </div>
+              </div>
+              <div class="discrepancy-card" id="discrepancy-card">
+                <div class="alert-icon">!</div>
+                <div class="discrepancy-content">
+                  <div class="discrepancy-title" data-layout-ignore="true">🚨 Fabricated Claim Flagged (Claim #4 of 14)</div>
+                  <div class="discrepancy-desc" data-layout-ignore="true">
+                    <b>Reference Truth:</b> Section 4 of the document specifies a <b>30-metre setback requirement</b>.<br />
+                    <b>Model Assertion:</b> Model invented an unsupported "40-metre" figure and ungrounded municipal policy.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SCENE 5: OUTRO & LAUNCH (15.8s - 18.0s) ================= -->
+      <div class="stage" id="scene-5">
+        <div class="brand-lockup">
+          <div class="brand-logo" id="logo-mark">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+          </div>
+          <h1 class="brand-title" id="logo-text">MERIDIAN</h1>
+          <p class="brand-tagline">
+            The multi-dimensional LLM evaluation & comparative positioning platform.<br />
+            Stop guessing model capabilities. Map their exact coordinates.
+          </p>
+          <div class="badge-cluster" data-layout-ignore="true">
+            <div class="cluster-item">7-Axis Radar</div>
+            <div class="cluster-item">Atomic Hallucination Audit</div>
+            <div class="cluster-item">Frontier Percentile Tiers</div>
+            <div class="cluster-item">100% Zero-Cost Stack</div>
+          </div>
+          <div class="cli-box" id="cli-box" data-layout-ignore="true">
+            <span class="cli-prompt">$</span> git clone https://github.com/Monish-D609/Meridian.git & .\run.ps1
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animation Orchestration -->
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // ================= TIMELINE SEQUENCE (18.0s @ 30fps) =================
+
+      // Ambient background glow subtle pulse (audio-reactive proxy)
+      tl.to("#ambient-glow", {
+        scale: 1.15,
+        opacity: 0.8,
+        duration: 1.8,
+        repeat: 8,
+        yoyo: true,
+        ease: "sine.inOut",
+      }, 0);
+
+      // --- SCENE 1 (0.0s – 3.70s) ---
+      tl.set("#scene-1", { autoAlpha: 1 }, 0);
+      tl.from("#scene-1 .stage-pill", { opacity: 0, y: -20, duration: 0.4, ease: "power3.out" }, 0.2);
+      tl.from("#scene-1 .hook-headline", { opacity: 0, y: 30, duration: 0.6, ease: "power3.out" }, 0.4);
+      tl.from("#compare-bad", { opacity: 0, x: -40, duration: 0.5, ease: "power3.out" }, 0.8);
+      tl.from("#compare-good", { opacity: 0, x: 40, duration: 0.5, ease: "power3.out" }, 1.0);
+
+      // Beat-locked strikethrough at 1.60s (strong cue)
+      // beat-locked: 1.60s
+      tl.fromTo(
+        "#compare-bad .strike-line",
+        { scaleX: 0, transformOrigin: "left center" },
+        { scaleX: 1, duration: 0.25, ease: "power4.out" },
+        1.60
+      );
+
+      // Scene 1 Exit at 3.70s (strong cue)
+      // beat-locked: 3.70s
+      tl.to("#scene-1", { opacity: 0, scale: 0.95, duration: 0.35, ease: "power2.in" }, 3.50);
+      tl.set("#scene-1", { autoAlpha: 0 }, 3.85);
+
+      // --- SCENE 2 (3.70s – 7.80s) ---
+      tl.set("#scene-2", { autoAlpha: 1 }, 3.70);
+      tl.from("#scene-2 .app-window", { opacity: 0, scale: 0.96, y: 30, duration: 0.5, ease: "power3.out" }, 3.70);
+
+      // Provider chips beat grid reveals (4.23s, 4.75s, 5.28s)
+      // beat-grid: chip-1 at 4.23s, chip-2 at 4.75s, chip-3 at 5.28s
+      tl.from("#chip-1", { opacity: 0, y: -10, duration: 0.2, ease: "back.out(1.5)" }, 4.23);
+      tl.from("#chip-2", { opacity: 0, y: -10, duration: 0.2, ease: "back.out(1.5)" }, 4.75);
+      tl.from("#chip-3", { opacity: 0, y: -10, duration: 0.2, ease: "back.out(1.5)" }, 5.28);
+
+      // Rows streaming pass
+      tl.from("#row-1", { opacity: 0, x: -20, duration: 0.25, ease: "power2.out" }, 4.5);
+      tl.from("#row-2", { opacity: 0, x: -20, duration: 0.25, ease: "power2.out" }, 5.0);
+      tl.from("#row-3", { opacity: 0, x: -20, duration: 0.25, ease: "power2.out" }, 5.5);
+      tl.from("#row-4", { opacity: 0, x: -20, duration: 0.25, ease: "power2.out" }, 6.0);
+      tl.from("#scene-2 .telemetry-bar", { opacity: 0, y: 20, duration: 0.4, ease: "power3.out" }, 6.3);
+
+      // Scene 2 Exit at 7.80s
+      tl.to("#scene-2", { opacity: 0, scale: 0.96, duration: 0.35, ease: "power2.in" }, 7.50);
+      tl.set("#scene-2", { autoAlpha: 0 }, 7.85);
+
+      // --- SCENE 3 (7.80s – 12.60s) ---
+      tl.set("#scene-3", { autoAlpha: 1 }, 7.80);
+      tl.from("#scene-3 .app-window", { opacity: 0, scale: 0.96, duration: 0.4, ease: "power3.out" }, 7.80);
+
+      // Radar bloom & polygon reveal
+      tl.fromTo(
+        "#cand-polygon",
+        { scale: 0, transformOrigin: "410px 340px", opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.8, ease: "elastic.out(1, 0.75)" },
+        8.20
+      );
+
+      // Tier Badges snap on beat-locked moments
+      // beat-locked: 8.96s
+      tl.from("#tier-1", { opacity: 0, x: 50, duration: 0.35, ease: "power3.out" }, 8.96);
+      tl.from("#tier-2", { opacity: 0, x: 50, duration: 0.35, ease: "power3.out" }, 9.50);
+      tl.from("#tier-3", { opacity: 0, x: 50, duration: 0.35, ease: "power3.out" }, 10.20);
+
+      // Subtle breathing pulse on the candidate polygon
+      tl.to("#cand-polygon", {
+        filter: "drop-shadow(0 0 24px rgba(107, 147, 245, 0.9))",
+        duration: 0.8,
+        repeat: 2,
+        yoyo: true,
+        ease: "sine.inOut"
+      }, 9.6);
+
+      // Scene 3 Exit at 12.60s
+      tl.to("#scene-3", { opacity: 0, scale: 0.96, duration: 0.35, ease: "power2.in" }, 12.30);
+      tl.set("#scene-3", { autoAlpha: 0 }, 12.65);
+
+      // --- SCENE 4 (12.60s – 15.80s) ---
+      tl.set("#scene-4", { autoAlpha: 1 }, 12.60);
+      tl.from("#scene-4 .app-window", { opacity: 0, scale: 0.96, duration: 0.4, ease: "power3.out" }, 12.60);
+
+      // Beat-locked Fabricated Claim alert at 12.65s (strong cue)
+      // beat-locked: 12.65s
+      tl.fromTo(
+        "#claim-highlight",
+        { backgroundColor: "transparent", color: "#f1f5f9" },
+        { backgroundColor: "rgba(239, 68, 68, 0.3)", color: "#ffffff", duration: 0.3, ease: "power4.out" },
+        12.65
+      );
+      tl.from("#discrepancy-card", { opacity: 0, y: 30, duration: 0.45, ease: "back.out(1.4)" }, 13.20);
+
+      // Scene 4 Exit at 15.80s
+      tl.to("#scene-4", { opacity: 0, scale: 0.96, duration: 0.35, ease: "power2.in" }, 15.50);
+      tl.set("#scene-4", { autoAlpha: 0 }, 15.85);
+
+      // --- SCENE 5 (15.80s – 18.00s) ---
+      tl.set("#scene-5", { autoAlpha: 1 }, 15.80);
+      tl.from("#logo-mark", { scale: 0.5, opacity: 0, duration: 0.5, ease: "back.out(1.7)" }, 15.90);
+      tl.from("#logo-text", { opacity: 0, y: 20, duration: 0.5, ease: "power3.out" }, 16.10);
+      tl.from("#scene-5 .brand-tagline", { opacity: 0, y: 15, duration: 0.4, ease: "power3.out" }, 16.30);
+      tl.from("#scene-5 .badge-cluster", { opacity: 0, scale: 0.95, duration: 0.4, ease: "power3.out" }, 16.60);
+      tl.from("#cli-box", { opacity: 0, y: 25, duration: 0.4, ease: "power3.out" }, 16.90);
+
+      // Final lock at 17.91s (strong cue)
+      // beat-locked: 17.91s
+      tl.to("#logo-mark", {
+        boxShadow: "0 0 60px rgba(107, 147, 245, 0.8)",
+        duration: 0.3,
+        ease: "power2.out"
+      }, 17.6);
+
+      // Export timeline to Hyperframes
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
